@@ -1,0 +1,222 @@
+@import url("https://fonts.googleapis.com/css?family=Kosugi");
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    /*background-image: url("assets/background.jpg");*/
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    font-family: Kosugi, sans-serif;
+    user-select: none;
+    /*background-color: #cecece;*/
+}
+
+#turtle {
+    transform-origin: 50% 100%;
+}
+
+#main {
+    display: flex;
+}
+
+#canvas_area {
+    width: auto;
+    height: auto;
+    margin: 1px auto;
+    display: inline-block;
+}
+
+#taskname {
+    text-align: center;
+    cursor: pointer;
+    font-size: 40px;
+    background-color: #e3fffa;
+    font-family: "Kosugi", sans-serif;
+}
+
+#canvas_wrapper {
+    position: relative;
+    width: 720px;
+    height: 720px;
+    background-color: rgb(128, 128, 128);
+    padding: 10px;
+    margin: 20px;
+}
+
+#mainCanvas {
+    display: block;
+    inset: 0;
+    z-index: 2;
+}
+
+#gridCanvas {
+    position: absolute;
+    display: block;
+    top: 10px;
+    left: 10px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#overlayImage {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+#field {
+    display: flex;
+    justify-content: space-between;
+}
+
+.color-picker-container {
+    margin: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.color-picker-label {
+    margin-right: 10px;
+}
+
+.color-picker {
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    outline: none;
+}
+
+.color-picker:hover {
+    cursor: pointer;
+}
+
+.btn {
+    width: 225px;
+    height: 75px;
+    margin: 20px 24.5px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 40px;
+    background-color: #e3fffa;
+    font-family: "Kosugi", sans-serif;
+}
+
+.btn:hover {
+    background: #ecfffc;
+}
+
+/* .btn_check {
+    
+} */
+
+#center_area {
+    width: auto;
+    height: auto;
+    margin: 1px auto;
+    display: inline-block;
+}
+
+#code_area {
+    width: 231px;
+    height: 726px;
+    margin: 20px auto;
+    border-width: 3px;
+    border-style: dashed;
+}
+
+#code_area1 {
+    border-top: none;
+}
+
+#code_area9 {
+    border-bottom: none;
+}
+
+.blocksnap_area {
+    width: 225px;
+    height: 80px;
+    border-top: 3px dashed;
+    background: #ffffff;
+    margin: 0px auto;
+}
+
+/* .btn_start {
+
+} */
+
+.btn_help {
+    border-radius: 1000px;
+    width: 90px;
+    height: 90px;
+    margin: 10px auto;
+}
+
+#block_area {
+    width: 300px;
+    height: auto;
+    margin: 10px auto;
+}
+
+.block {
+    cursor: grab;
+    position: relative;
+    margin: 12px auto;
+    padding: 0px;
+    width: 231px;
+    height: 80px;
+    background: rgb(214, 255, 248);
+    border-style: solid;
+    border-radius: 15px;
+    border-width: 3px;
+    display: block;
+    font-size: large;
+    display: grid;
+    place-items: center;
+}
+
+.center {
+    margin: 0px;
+    padding: 0px;
+    /* text-align: center; */
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.block_numbox {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+    font-size: 25px;
+}
+
+.block_drag {
+    background: rgb(231, 252, 248);
+}
+
+.block_hover {
+    background: rgb(233, 233, 233);
+}
+
+.block_snap {
+    background: rgb(180, 255, 243);
+}
+
+#others_area {
+    width: 100px;
+    height: auto;
+    margin: 20px auto;
+}
+
+
+@media screen and (max-width: 1000px) {}

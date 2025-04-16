@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utfr-8" />
+    <title>Turtle Graphics</title>
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/TurtleGraphics.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/introjs.min.css') }}">
+</head>
+
+<body>
+    <div id="page" style="width: 100%; height: 100%">
+        <div id="main">
+            <div id="canvas_area">
+                <div id="taskname">{{ title }}</div>
+                <div id="canvas_wrapper">
+                    <div data-step='1' data-intro='Help Text First!!'>
+                        <canvas id="mainCanvas" width="700" height="700"></canvas>
+                    </div>
+                    <canvas id="gridCanvas" width="700" height="700"></canvas>
+                    <img id="overlayImage" src="static/assets/{{ image }}" />
+                </div>
+                <div id="field">
+                    <div class="color-picker-container">
+                        <label class="color-picker-label" for="colorPicker">Color Picker:</label>
+                        <input class="color-picker" type="color" id="colorPicker" value="#000000" />
+                    </div>
+                    <button class="btn" type="button" id="checkButton" onclick="grid()">
+                        GridONOFF
+                    </button>
+                    <button id="btn_check" class="btn btn_check" type="button" id="checkButton" onclick="check()">
+                        CHECK
+                    </button>
+                </div>
+            </div>
+
+            <div id="center_area">
+                <div>
+                    <button id="btn_start" class="btn btn_start" type="button" onclick="start()">
+                        START
+                    </button>
+                    <button class="btn btn_start" type="button" onclick="clearbtn()">
+                        CLEAR
+                    </button>
+                </div>
+
+                <div id="code_area">
+                    <div id="code_area1" class="blocksnap_area"></div>
+                    <div id="code_area2" class="blocksnap_area"></div>
+                    <div id="code_area3" class="blocksnap_area"></div>
+                    <div id="code_area4" class="blocksnap_area"></div>
+                    <div id="code_area5" class="blocksnap_area"></div>
+                    <div id="code_area6" class="blocksnap_area"></div>
+                    <div id="code_area7" class="blocksnap_area"></div>
+                    <div id="code_area8" class="blocksnap_area"></div>
+                    <div id="code_area9" class="blocksnap_area"></div>
+                </div>
+            </div>
+
+            <div id="block_area">
+                {{ blocks_html|safe }}
+            </div>
+            <div id="others_area">
+                <div id="help">
+                    <!--
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <img src="static/assets/turtle.png" id="turtle" style="position: absolute; top: 450px; left: 450px" />
+    <script src="{{ url_for('static', filename='js/intro.min.js') }}"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        var startx = 450; //初期位置
+        var starty = 450; //初期位置
+        canvrate_x = 900 / window.innerWidth;
+        canvrate_y = 900 / window.innerHeight;
+        let currentX = startx;
+        let currentY = starty;
+        turtle_speed = 1;
+        codeAreaSize = 9;
+        tutorialCheck1 = false;
+
+
+        //////////////////
+        ////キャンバス/////
+        //////////////////
+        const maincanvas = document.querySelector("#mainCanvas");
+        const gridcanvas = document.querySelector("#gridCanvas");
+        const cvs = document.getElementById("mainCanvas");
+        let rect = cvs.getBoundingClientRect(); // 初期値を設定
+        const colorPicker = document.getElementById("colorPicker");
+        const mainCtx = maincanvas.getContext("2d");
+        const gridCtx = gridcanvas.getContext("2d");
+        var x = (y = a = 0);
+        // 初期の線の色
+        let lineColor = "rgb(0, 0, 0)";
+
+        mainCtx.fillStyle = "rgb(256, 256, 256)"; // キャンバスの背景色（内側の白色） 
+        mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
+
+        // グリッド描画
+        const gridSize = 100;  // グリッド間隔（100ピクセル）
+        gridCtx.strokeStyle = "rgb(200, 200, 200)";
+        gridCtx.lineWidth = 1;
+        for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
+            if (i < gridcanvas.width) {
+                gridCtx.beginPath();
+                gridCtx.moveTo(i, 0);
+                gridCtx.lineTo(i, gridcanvas.height);
+                gridCtx.stroke();
+            }
+            if (i < gridcanvas.height) {
+                gridCtx.beginPath();
+                gridCtx.moveTo(0, i);
+                gridCtx.lineTo(gridcanvas.width, i);
+                gridCtx.stroke();
+            }
+        }
+
+        mainCtx.strokeStyle = lineColor;
+
+        // イベントリスナーを追加して色の変更を検知する
+        colorPicker.addEventListener("input", function () {
+            lineColor = colorPicker.value;
+            mainCtx.strokeStyle = lineColor;
+        });
+
+        cvs.addEventListener("click", e => {
+            rect = e.target.getBoundingClientRect();
+
+            // ブラウザ上でのクリック位置を取得
+            const viewX = e.clientX - rect.left,
+                viewY = e.clientY - rect.top;
+
+            // 表示サイズとキャンバスの実際のサイズ比率を計算
+            const scaleWidth = cvs.clientWidth / cvs.width,
+                scaleHeight = cvs.clientHeight / cvs.height;
+
+            // ブラウザのクリック位置をキャンバス上の位置に変換
+            const canvasX = Math.floor(viewX / scaleWidth),
+                canvasY = Math.floor(viewY / scaleHeight);
+
+            currentX = canvasX;
+            currentY = canvasY;
+            // タートル要素を取得
+            const turtle = document.getElementById("turtle");
+
+            // タートルの幅と高さを取得
+            const turtleWidth = turtle.offsetWidth; // 26px
+            const turtleHeight = turtle.offsetHeight; // 36px
+
+            // カメのしっぽの位置をクリック位置に合わせるための調整
+            // しっぽが画像の中央下部であるため、x座標は中央、y座標は下部に合わせる
+            turtle.style.position = "absolute";
+            turtle.style.left = `${rect.left + window.pageXOffset + canvasX - turtleWidth / 2}px`;
+            turtle.style.top = `${rect.top + window.pageYOffset + canvasY - turtleHeight}px`;
+
+        });
+
+        // ページ読み込み時にクエリパラメータからステージの値を取得して処理
+        window.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const stage = urlParams.get('stage') || '1';
+            const imgnum = stage;
+            displayCanvasImage(imgnum);
+            const stageValueElement = document.getElementById('stageValue');
+            if (stageValueElement) {
+                stageValueElement.textContent = stage;
+            }
+        });
+
+        // 課題図形の表示
+        function displayCanvasImage(imgnum) {
+            // 課題図形の画像のパスを構築
+            var imagePath = `static/assets/canvas_${imgnum}.png`;
+            img = document.getElementById("overlayImage");
+            img.src = imagePath;
+            img.width = maincanvas.width;
+            img.height = maincanvas.height;
+        }
+
+        //////////////////
+        //ドラッグ処理//
+        //////////////////
+        $(function () {
+            var now_object = null;
+
+            $(".block").draggable({
+                // ドラッグ開始時の処理
+                start: function () {
+                    now_object = $(this);
+                    now_object.addClass("block_drag");
+                    now_object.removeClass("block_snap");
+                },
+                //ドラッグ終了時の処理
+                stop: function () {
+                    now_object.removeClass("block_drag");
+                    //配列を作る
+                    create_array();
+                },
+            });
+
+            $(".blocksnap_area").droppable({
+                hoverClass: "block_hover",
+                //ドロップした時
+                drop: function (event, ui) {
+                    now_object.offset({
+                        top: $(this).offset().top,
+                        left: $(this).offset().left - 3,
+                    });
+                    now_object.addClass("block_snap");
+                },
+            });
+        });
+
+        //////////////////
+        // 配列を作る ////
+        //////////////////
+        var code_array = [];
+        for (var i = 0; i < codeAreaSize; i++) {
+            code_array[i] = [];
+            for (var j = 0; j < 2; j++) {
+                code_array[i][j] = 0;
+            }
+        }
+
+        const totalBlocks = parseInt("{{ total_blocks }}");
+        let element = null;
+        let datatype = null;
+
+        function create_array() {
+            // 各コードエリアとブロックの位置を取得
+            const codearea_top = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().top);
+            const codearea_left = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().left);
+            const blocks_top = Array.from({ length: totalBlocks }, (_, i) => $(`#block${i + 1}`).offset().top);
+            const blocks_left = Array.from({ length: totalBlocks }, (_, i) => $(`#block${i + 1}`).offset().left);
+
+            const size = totalBlocks; // 配列の大きさ
+            let array_flag = 0;
+
+            // 上のエリアから順に何のブロックがドロップされているか検知
+            // ブロック1からブロック9まで(1,2,3,4,5,6,7,8,9)を配列に代入
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (
+                        codearea_top[i] === blocks_top[j] &&
+                        codearea_left[i] === blocks_left[j] + 3
+                    ) {
+                        element = document.getElementById(`block${j + 1}`);
+                        code_array[i][0] = element.dataset.type;
+                        code_array[i][1] = document.getElementById(`block${j + 1}`);
+                        array_flag = 1;
+                        break; // マッチしたら内側のループを抜ける
+                    }
+                }
+                // ブロックを検知できなかった時、0を入れる
+                if (array_flag === 0) {
+                    code_array[i][0] = 0;
+                } else {
+                    array_flag = 0;
+                }
+            }
+            console.log("配列＝" + code_array);
+            const event = new CustomEvent('codeArrayChanged');
+            document.dispatchEvent(event);
+        }
+
+        let flag = false;
+        function grid() {
+            // グリッド描画
+            const gridSize = 100;  // グリッド間隔（100ピクセル）
+            gridCtx.strokeStyle = "rgb(200, 200, 200)";
+            gridCtx.lineWidth = 1;
+
+            if (flag == true) {
+                mainCtx.strokeStyle = "rgb(255, 255, 255)";
+                for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
+                    if (i < gridcanvas.width) {
+                        gridCtx.beginPath();
+                        gridCtx.moveTo(i, 0);
+                        gridCtx.lineTo(i, gridcanvas.height);
+                        gridCtx.stroke();
+                    }
+                    if (i < gridcanvas.height) {
+                        gridCtx.beginPath();
+                        gridCtx.moveTo(0, i);
+                        gridCtx.lineTo(gridcanvas.width, i);
+                        gridCtx.stroke();
+                    }
+                }
+                flag = false;
+            }
+            else {
+                gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height);
+                flag = true;
+            }
+
+        }
+        //////////////////
+        ///// クリア //////
+        //////////////////
+        function clearbtn() {
+            mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
+        }
+
+        //////////////////
+        ///// 前進 //////
+        //////////////////
+        function fd(step) {
+            return new Promise((resolve) => {
+                function fd_draw() {
+                    lineColor = colorPicker.value;
+                    mainCtx.strokeStyle = lineColor;
+                    if (step > 0) {
+                        const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+                        const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+
+                        if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) {
+                            console.log("カメが端に到達：fd中断フラグON");
+                            abortFlag = true;
+                            resolve();
+                            return;
+                        }
+
+                        mainCtx.beginPath();
+                        mainCtx.lineWidth = 10;
+                        mainCtx.moveTo(currentX, currentY);
+                        currentX = nextX;
+                        currentY = nextY;
+                        mainCtx.lineTo(currentX, currentY);
+                        mainCtx.stroke();
+
+                        const turtleWidth = turtle.offsetWidth;
+                        const turtleHeight = turtle.offsetHeight;
+                        turtle.style.left = `${rect.left + window.pageXOffset + currentX + x - turtleWidth / 2}px`;
+                        turtle.style.top = `${rect.top + window.pageYOffset + currentY - y - turtleHeight}px`;
+                        step--;
+
+                        if (step === 0) {
+                            resolve();
+                        } else {
+                            requestAnimationFrame(fd_draw);
+                        }
+                    }
+                }
+                fd_draw();
+            });
+        }
+
+
+        // 右回転
+        function rt(angle) {
+            a += angle;
+            // タートルの回転角度を更新
+            turtle.style.transform = `rotate(${a}deg)`;
+        }
+
+        // 左回転
+        function lt(angle) {
+            a -= angle;
+            // タートルの回転角度を更新
+            turtle.style.transform = `rotate(${a}deg)`;
+        }
+
+        //////////////////
+        /////スタート//////
+        //////////////////
+
+        async function start() {
+            x = y = a = 0;
+            a = 0;
+            abortFlag = false;
+            turtle.style.transform = `rotate(${a}deg)`;
+
+            for (var i = 0; i < totalBlocks; i++) {
+                i = await processCode(i);
+                if (abortFlag) {
+                    console.log("start() 処理中断！");
+                    break;
+                }
+            }
+            const event = new CustomEvent('paintdone');
+            document.dispatchEvent(event);
+        }
+
+
+        async function processCode(index) {
+            console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`); // デバッグメッセージ
+            switch (code_array[index][0]) {
+                case "fd":
+                    await fd(parseFloat(code_array[index][1].querySelector("input").value));
+                    break;
+                case "rt":
+                    rt(parseFloat(code_array[index][1].querySelector("input").value));
+                    break;
+                case "lt":
+                    lt(parseFloat(code_array[index][1].querySelector("input").value));
+                    break;
+                case "for1":
+                    //code_arrayにfor2が含まれているか
+                    const end_for_index = code_array.findIndex(row => row[0] === "for2");
+                    if (end_for_index !== -1) {
+                        const start_for = index;
+
+                        if (end_for_index < start_for) {
+                            alert("順番がおかしい");
+                            break;
+                        }
+
+                        // j回繰り返す（回数は code_array[start_for][1] から取る）
+                        const inputEl = code_array[start_for][1].querySelector("input");
+                        const repeatCount = parseFloat(inputEl.value);
+
+                        for (let j = 1; j <= repeatCount; j++) {
+                            for (let k = start_for + 1; k < end_for_index; k++) {
+                                await processCode(k);
+                            }
+                        }
+                        return end_for_index; // for2の次にジャンプ
+                    } else {
+                        alert("繰り返しの終端が必要");
+                    }
+                    break;
+                case "if1":
+                    const end_if_index = code_array.findIndex(row => row[0] === "if2");
+                    if (end_if_index !== -1) {
+                        const start_if = index;
+
+                        if (end_if_index < start_if) {
+                            alert("順番がおかしい");
+                            break;
+                        }
+
+                        // この境界チェックはあくまで「条件判定」のため → abortFlag いじらない
+                        const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+                        const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+                        if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) {
+                            console.log("if条件が成立（カメが端にいる）");
+
+                            for (let k = start_if + 1; k < end_if_index; k++) {
+                                k = await processCode(k);
+                                if (abortFlag) break;
+                            }
+                        }
+                        return end_if_index;
+                    } else {
+                        alert("IFの終端が必要");
+                    }
+                    break;
+                case 11:
+                    break; // 終端
+                default:
+                    break;
+            }
+            return index; // 次のインデックスに進む
+        }
+
+        //////////////////////////////////////////////////
+        ////////////pythonデータ受け渡し///////////////////
+        //////////////////////////////////////////////////
+        function check() {
+            const imageData = mainCtx.getImageData(
+                10,
+                10,
+                maincanvas.width - 20,
+                maincanvas.height - 20
+            );
+            // Canvasを作成し、取得した画像データを描画
+            const tempCanvas = document.createElement('canvas');
+            const tempmainCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = imageData.width;
+            tempCanvas.height = imageData.height;
+            tempmainCtx.putImageData(imageData, 0, 0);
+            // ImageDataをBase64に変換
+            const base64Image = tempCanvas.toDataURL("image/png");
+            const urlParams = new URLSearchParams(window.location.search);
+            const stage = urlParams.get('stage') || '1';
+
+            // 送信するデータをオブジェクトにまとめる
+            const sendData = {
+                imgnumData: stage,
+                imageData: base64Image
+            };
+
+            console.log("Sending stage:", stage);
+            console.log("ImageData length:", base64Image.length);
+
+            fetch("/match_images", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // 0.2より小さいなら失敗
+                    if (data.matchingValue < 0.2) {
+                        alert("不正解！" + data.matchingValue);
+                    } else {
+                        alert("正解！" + data.matchingValue);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error occurred during matching.");
+                });
+        }
+
+        let intro = introJs();
+        let turtlePositionSet = false;
+        let blockSet = false;
+        let numSet = false;
+        let paintdone = false;
+        let chekdone = false;
+
+
+        intro.setOptions({
+            showProgress: false,
+            disableInteraction: true,
+            exitOnEsc: false,
+            exitOnOverlayClick: false,
+            nextLabel: "次へ",
+            prevLabel: "戻る",
+            doneLabel: "チュートリアルを終わる",
+            steps: [
+                {
+                    intro: "このチュートリアルでは、このアプリの使い方を順番にご案内します！<br>一緒に画面を見ながら進めてみましょう。",
+                },
+                {
+                    element: "#canvas_wrapper",
+                    intro: "ここがカメのキャンバスです。<br>課題の図形も薄く表示されるので、なぞるように描いていきます。<br>1マス分の大きさ＝カメが100歩進んだ距離になっています。",
+                },
+                {
+                    element: "#turtle",
+                    intro: "このカメが、あなたの命令にしたがって線を引いてくれます。<br>キャンバスをクリックして、スタート位置を決めてあげましょう！",
+                },
+                {
+                    element: "#block_area",
+                    intro: "ここにあるのが命令ブロックです。<br>カメに『どう動くか』を伝えるために使います。",
+                },
+                {
+                    element: "#code_area",
+                    intro: "ここがプログラムを書く場所です。<br>命令ブロックを順番に並べると、カメがその通りに動きます。",
+                },
+                {
+                    element: "#btn_start",
+                    intro: "準備ができたら、ここをクリックするとカメが動き出します！",
+                },
+                {
+                    element: "#btn_check",
+                    intro: "図形が完成したら、このボタンで答え合わせができます。",
+                },
+                {
+                    intro: "では実際にやってみましょう！<br>まずはカメを直線で動かしてみます。",
+                },
+                {
+                    element: "#canvas_wrapper",
+                    intro: "キャンバスをクリックして、カメのスタート位置を決めてください。",
+                },
+                {
+                    element: "body",
+                    intro: "次に「〇歩進む」ブロックを使って、まっすぐ線を引いてみましょう。",
+                },
+                {
+                    element: "#block1",
+                    intro: "この「歩進む」ブロックを、中央のプログラムエリアにドラッグしてください。",
+                },
+                {
+                    element: "#number1",
+                    intro: "数字を入力します。課題と同じ長さになるように、ここでは「300」と入れてみましょう。",
+                },
+                {
+                    element: "body",
+                    intro: "OK！ブロックが完成しましたね。",
+                },
+                {
+                    element: "#btn_start",
+                    intro: "それでは「スタート」ボタンをクリックしてみましょう！",
+                },
+                {
+                    element: "body",
+                    intro: "カメが動いて線が引けましたか？",
+                },
+                {
+                    element: "#btn_check",
+                    intro: "今描いた線が正しいか確認してみましょう。「チェック」ボタンをクリック！",
+                },
+                {
+                    element: "body",
+                    intro: "「正解！」と表示されましたか？",
+                },
+                {
+                    element: "body",
+                    intro: "これがこのアプリの基本の使い方です。<br>次の問題にも挑戦してみてください！",
+                },
+            ]
+        });
+
+
+        //一時停止用の制御
+        intro.onafterchange(function (targetElement) {
+            const currentStep = intro._currentStep;
+
+            if (currentStep === 9 && !turtlePositionSet) {
+                intro.exit();
+
+                //ユーザーがキャンバスをクリックするのを待つ
+                const canvas = document.getElementById("canvas_wrapper");
+                const handler = () => {
+                    turtlePositionSet = true;
+                    canvas.removeEventListener("click", handler);
+                    intro.goToStep(10);
+                };
+
+                canvas.addEventListener("click", handler);
+            }
+            if (currentStep === 11 && !blockSet) {
+                intro.exit();
+
+                //ユーザーがブロックを配置するのを待つ
+                document.addEventListener('codeArrayChanged', function checkFdBlock() {
+                    if (code_array[0][0] === "fd") {
+                        blockSet = true;
+                        document.removeEventListener('codeArrayChanged', checkFdBlock);
+                        intro.goToStep(12);
+                    }
+                });
+            }
+            if (currentStep === 12 && !numSet) {
+                intro.exit();
+                const numberInput = document.getElementById("number1");
+
+                // ユーザーの数値入力を待つ
+                const inputHandler = function () {
+                    if (numberInput.value === "300") {
+                        numSet = true;
+                        numberInput.removeEventListener("input", inputHandler);
+                        intro.goToStep(13);
+                    }
+                };
+
+                // 入力フィールドの変更を監視
+                numberInput.addEventListener("input", inputHandler);
+            }
+            if (currentStep === 14 && !paintdone) {
+                intro.exit();
+                //ユーザーが描画完了するのを待つ
+                document.addEventListener('paintdone', function checkpaintdone() {
+                    paintdone = true;
+                    document.removeEventListener('paintdone', checkpaintdone);
+                    intro.goToStep(15);
+                });
+            }
+            if (currentStep === 16 && !chekdone) {
+                intro.exit();
+                //ユーザーがチェック完了を待つ
+                const checkbtn = document.getElementById("btn_check");
+                const handler = () => {
+                    chekdone = true;
+                    checkbtn.removeEventListener("click", handler);
+                    intro.goToStep(17);
+                };
+
+                checkbtn.addEventListener("click", handler);
+            }
+        });
+
+        // 実行
+        window.addEventListener("DOMContentLoaded", () => {
+            intro.start();
+        });
+    </script>
+</body>
+
+</html>

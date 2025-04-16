@@ -1,0 +1,339 @@
+@import url("https://fonts.googleapis.com/css?family=Kosugi");
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    /*background-image: url("assets/background.jpg");*/
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    font-family: Kosugi, sans-serif;
+    user-select: none;
+    /*background-color: #cecece;*/
+}
+
+#turtle {
+    transform-origin: 50% 100%;
+}
+
+#main {
+    display: flex;
+}
+
+#canvas_wrapper {
+    margin: 20px;
+    position: relative;
+}
+
+#overlayImage {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.field {
+    display: flex;
+    justify-content: space-between;
+}
+
+.color-picker-container {
+    margin: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.color-picker-label {
+    margin-right: 10px;
+}
+
+.color-picker {
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    outline: none;
+}
+
+.color-picker:hover {
+    cursor: pointer;
+}
+
+.btn_check {
+    width: 225px;
+    height: 75px;
+    margin: 20px 24.5px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 40px;
+    background-color: #e3fffa;
+    font-family: "Kosugi", sans-serif;
+    visibility: hidden;
+}
+
+.btn_check:hover {
+    background: #ecfffc;
+}
+
+#canvas_wrapper {
+    width: 800px;
+    height: 800px;
+    background-color: rgb(128, 128, 128);
+    padding: 10px;
+}
+
+#Canvasbody {
+    display: block;
+    top: 0;
+    left: 0;
+}
+
+#center_area {
+    width: auto;
+    height: auto;
+    margin: 1px auto;
+    display: inline-block;
+}
+
+#code_area {
+    width: 231px;
+    height: auto;
+    margin: 20px auto;
+    border-width: 3px;
+    border-style: dashed;
+}
+
+#code_area1 {
+    border-top: none;
+}
+
+#code_area9 {
+    border-bottom: none;
+}
+
+.blocksnap_area {
+    width: 225px;
+    height: 80px;
+    border-top: 3px dashed;
+    background: #ffffff;
+    margin: 0px auto;
+}
+
+.btn_start {
+    width: 225px;
+    height: 80px;
+    margin: 20px 24.5px;
+    border-radius: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 40px;
+    background-color: #e3fffa;
+    font-family: "Kosugi", sans-serif;
+}
+
+.btn_start:hover {
+    background: #ecfffc;
+}
+
+.btn_help {
+    border-radius: 1000px;
+    width: 90px;
+    height: 90px;
+    margin: 10px auto;
+}
+
+#block_area {
+    width: 300px;
+    height: auto;
+    margin: 10px auto;
+}
+
+.block {
+    cursor: grab;
+    position: relative;
+    margin: 12px auto;
+    padding: 0px;
+    width: 231px;
+    height: 80px;
+    background: rgb(214, 255, 248);
+    border-style: solid;
+    border-radius: 15px;
+    border-width: 3px;
+    display: block;
+    font-size: large;
+}
+
+.block_numbox {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+    font-size: 25px;
+}
+
+.block_drag {
+    background: rgb(231, 252, 248);
+}
+
+.block_hover {
+    background: rgb(233, 233, 233);
+}
+
+.block_snap {
+    background: rgb(180, 255, 243);
+}
+
+#others_area {
+    width: 100px;
+    height: auto;
+    margin: 20px auto;
+}
+
+/* トグルスイッチ */
+.switch_outer {
+    width: 90px;
+    height: 50px;
+    background-color: lightgray;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    border: #000;
+    border-style: solid;
+}
+
+.switch_outer.active {
+    background-color: #51e373;
+}
+
+.toggle_switch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    position: absolute;
+    background-color: white;
+    top: 0;
+    bottom: 0;
+    left: 5px;
+    margin: auto;
+    box-shadow: 1px 1px 7px #b7b7b7, -1px -1px 4px #cecece inset;
+    transition: left 0.3s ease-in-out;
+    border: #000;
+    border-style: solid;
+}
+
+.toggle_switch.active {
+    left: 45px;
+}
+
+input:invalid {
+    background-color: #ffb4ec;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+/* モーダル関連 */
+.modal-open {
+    position: fixed;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100px;
+    height: 100px;
+    color: #fff;
+    background: #000;
+    border: none;
+    cursor: pointer;
+}
+
+.modal {
+    width: 1200px;
+    height: 900px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background: rgba(139, 139, 139, 0.5);
+    padding: 40px 20px;
+    overflow: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.modal:before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+    margin-left: -0.2em;
+}
+
+.modal.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-container {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 1200px;
+    width: 90%;
+}
+
+.modal-close {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -20px;
+    right: -20px;
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.modal-content {
+    background: #fff;
+    height: 100px;
+    width: 100px;
+    padding: 20px;
+    margin: 10px;
+}
+
+.modal-content p {
+    margin: 1em 0;
+}
+
+.modal-grid-container {
+    height: auto;
+    width: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.modal-grid-item {
+    height: 150px;
+    width: 150px;
+    background-color: lightblue;
+    padding: 50px;
+    text-align: center;
+}
+
+@media screen and (max-width: 1000px) {}

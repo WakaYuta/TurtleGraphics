@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utfr-8" />
+    <title>Turtle Graphics</title>
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+    <style>
+        @import url("https://fonts.googleapis.com/css?family=Kosugi");
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            /*background-image: url("assets/background.jpg");*/
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            font-family: Kosugi, sans-serif;
+            user-select: none;
+            /*background-color: #cecece;*/
+        }
+
+        #turtle {
+            transform-origin: 50% 100%;
+        }
+
+        #main {
+            display: flex;
+        }
+
+        #canvas_wrapper {
+            margin: 20px;
+            position: relative;
+        }
+
+        #overlayImage {
+            position: absolute;
+            top: 10px;
+            /* 画像の位置を調整 */
+            left: 10px;
+            opacity: 0.3;
+            /* 画像の透明度を設定 */
+            pointer-events: none;
+        }
+
+        .field {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .color-picker-container {
+            margin: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .color-picker-label {
+            margin-right: 10px;
+        }
+
+        .color-picker {
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            outline: none;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        .btn_check {
+            width: 225px;
+            height: 75px;
+            margin: 20px 24.5px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 40px;
+            background-color: #e3fffa;
+            font-family: "Kosugi", sans-serif;
+            visibility: hidden;
+        }
+
+        .btn_check:hover {
+            background: #ecfffc;
+        }
+
+        #canvas_wrapper {
+            width: 800px;
+            height: 800px;
+            background-color: rgb(128, 128, 128);
+            /* 外側の灰色 */
+            padding: 10px;
+            /* 内側の余白を確保してキャンバスを配置 */
+        }
+
+        #Canvasbody {
+            display: block;
+            /* インライン要素ではなくブロック要素として扱う */
+            top: 0;
+            left: 0;
+        }
+
+        #center_area {
+            width: auto;
+            height: auto;
+            /*order-style: solid;*/
+            margin: 1px auto;
+            display: inline-block;
+        }
+
+        #code_area {
+            width: 231px;
+            height: 726px;
+            margin: 20px auto;
+            border-width: 3px;
+            border-style: dashed;
+        }
+
+        #code_area1 {
+            border-top: none;
+        }
+
+        #code_area9 {
+            border-bottom: none;
+        }
+
+        .blocksnap_area {
+            width: 225px;
+            height: 80px;
+            border-top: 3px dashed;
+            background: #ffffff;
+            margin: 0px auto;
+        }
+
+        .btn_start {
+            width: 225px;
+            height: 80px;
+            margin: 20px 24.5px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 40px;
+            background-color: #e3fffa;
+            font-family: "Kosugi", sans-serif;
+        }
+
+        .btn_start:hover {
+            background: #ecfffc;
+        }
+
+        .btn_help {
+            border-radius: 1000px;
+            width: 90px;
+            height: 90px;
+            margin: 10px auto;
+        }
+
+
+
+        #block_area {
+            width: 300px;
+            height: auto;
+            margin: 10px auto;
+            /*order-style: solid;*/
+        }
+
+        .block {
+            cursor: grab;
+            position: relative;
+            margin: 12px auto;
+            padding: 0px;
+            width: 231px;
+            height: 80px;
+            background: rgb(214, 255, 248);
+            border-style: solid;
+            border-radius: 15px;
+            border-width: 3px;
+            display: block;
+            font-size: large;
+        }
+
+        .block_numbox {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            font-size: 25px;
+        }
+
+        .block_drag {
+            background: rgb(231, 252, 248);
+        }
+
+        .block_hover {
+            background: rgb(233, 233, 233);
+        }
+
+        .block_snap {
+            background: rgb(180, 255, 243);
+        }
+
+        #others_area {
+            width: 100px;
+            height: auto;
+            margin: 20px auto;
+        }
+
+        /*トグルスイッチ*/
+        .switch_outer {
+            width: 90px;
+            height: 50px;
+            background-color: lightgray;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border: #000;
+            border-style: solid;
+        }
+
+        .switch_outer.active {
+            background-color: #51e373;
+        }
+
+        .toggle_switch {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: absolute;
+            background-color: white;
+            top: 0;
+            bottom: 0;
+            left: 5px;
+            margin: auto;
+            box-shadow: 1px 1px 7px #b7b7b7, -1px -1px 4px #cecece inset;
+            transition: left 0.3s ease-in-out;
+            border: #000;
+            border-style: solid;
+        }
+
+        .toggle_switch.active {
+            left: 45px;
+        }
+
+        ▼ input:invalid {
+            background-color: #ffb4ec;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            margin: 0;
+            -webkit-appearance: none;
+        }
+
+
+
+        /* モーダルを開くボタン */
+        .modal-open {
+            position: fixed;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100px;
+            height: 100px;
+            color: #fff;
+            background: #000;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* モーダルと背景の指定 */
+        .modal {
+            width: 1200px;
+            height: 900px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(139, 139, 139, 0.5);
+            padding: 40px 20px;
+            overflow: auto;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            box-sizing: border-box;
+            z-index: 1;
+        }
+
+        /* モーダルの擬似要素の指定 */
+        .modal:before {
+            content: "";
+            display: inline-block;
+            vertical-align: middle;
+            height: 100%;
+            margin-left: -0.2em;
+        }
+
+        /* クラスが追加された時の指定 */
+        .modal.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* モーダル内側の指定 */
+        .modal-container {
+            position: relative;
+            display: inline-block;
+            vertical-align: middle;
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        /* モーダルを閉じるボタンの指定 */
+        .modal-close {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: -20px;
+            right: -20px;
+            width: 40px;
+            height: 40px;
+            color: #fff;
+            background: #000;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* モーダルのコンテンツ部分の指定 */
+        .modal-content {
+            background: #fff;
+            height: 100px;
+            width: 100px;
+            padding: 20px;
+            margin: 10px;
+        }
+
+        /* モーダルのコンテンツ部分のテキストの指定 */
+        .modal-content p {
+            margin: 1em 0;
+        }
+
+        /* Gridコンテナ内の要素を整列させるためのCSS */
+        .modal-grid-container {
+            height: auto;
+            width: auto;
+            display: grid;
+            /* Gridコンテナを有効化 */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            /* 列の数とサイズを指定 */
+            grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
+            /* 行の数とサイズを指定 */
+            gap: 20px;
+            /* セル間の余白を指定 */
+        }
+
+        .modal-grid-item {
+            height: 150px;
+            width: 150px;
+            background-color: lightblue;
+            /* 要素の背景色を指定 */
+            padding: 50px;
+            text-align: center;
+            /* テキストを中央揃えにする */
+        }
+
+        @media screen and (max-width: 1000px) {}
+    </style>
+</head>
+
+<body>
+    <div id="page" style="width: 100%; height: 100%">
+        <div id="main">
+            <div id="canvas_wrapper">
+                <canvas id="Canvasbody" width="780" height="780"></canvas>
+                <img id="overlayImage" src="" />
+
+                <div class="field">
+                    <div class="color-picker-container">
+                        <label class="color-picker-label" for="colorPicker">Color Picker:</label>
+                        <input class="color-picker" type="color" id="colorPicker" value="#000000" />
+                    </div>
+                    <button class="btn btn_check" type="button" id="checkButton" onclick="check()">
+                        CHECK
+                    </button>
+                </div>
+            </div>
+
+            <div id="center_area">
+                <div>
+                    <button class="btn btn_start" type="button" onclick="start()">
+                        START
+                    </button>
+                    <button class="btn btn_start" type="button" onclick="clearbtn()">
+                        CLEAR
+                    </button>
+                </div>
+
+                <div id="code_area">
+                    <div id="code_area1" class="blocksnap_area"></div>
+                    <div id="code_area2" class="blocksnap_area"></div>
+                    <div id="code_area3" class="blocksnap_area"></div>
+                    <div id="code_area4" class="blocksnap_area"></div>
+                    <div id="code_area5" class="blocksnap_area"></div>
+                    <div id="code_area6" class="blocksnap_area"></div>
+                    <div id="code_area7" class="blocksnap_area"></div>
+                    <div id="code_area8" class="blocksnap_area"></div>
+                    <div id="code_area9" class="blocksnap_area"></div>
+                </div>
+            </div>
+
+            <div id="block_area">
+                <div id="block1" class="block" value="a">
+                    <p align="center">
+                        <input type="number" id="number1" class="block_numbox" min="0" max="999" />歩進む<br />
+                    </p>
+                </div>
+                <div id="block2" class="block">
+                    <p align="center">
+                        <input type="number" id="number2" class="block_numbox" min="0" max="999" />度右に曲がる<br />
+                    </p>
+                </div>
+                <div id="block3" class="block">
+                    <p align="center">
+                        <input type="number" id="number3" class="block_numbox" min="0" max="999" />度左に曲がる<br />
+                    </p>
+                </div>
+                <div id="block4" class="block">
+                    <p align="center">
+                        <input type="number" id="number4" class="block_numbox" min="0" max="999" />回繰りかえす<br />
+                    </p>
+                </div>
+                <div id="block5" class="block">
+                    <p align="center">ここまで繰りかえす<br /></p>
+                </div>
+                <div id="block6" class="block">
+                    <p align="center">
+                        <input type="number" id="number6" class="block_numbox" min="0" max="999" />歩進む<br />
+                    </p>
+                </div>
+                <div id="block7" class="block">
+                    <p align="center">
+                        <input type="number" id="number7" class="block_numbox" min="0" max="999" />歩進む<br />
+                    </p>
+                </div>
+                <div id="block8" class="block">
+                    <p align="center">
+                        <input type="number" id="number8" class="block_numbox" min="0" max="999" />度右に曲がる<br />
+                    </p>
+                </div>
+                <div id="block9" class="block">
+                    <p align="center">
+                        <input type="number" id="number9" class="block_numbox" min="0" max="999" />度左に曲がる<br />
+                    </p>
+                </div>
+                <div id="block10" class="block">
+                    <p align="center">
+                        壁にぶつかったら<br />
+                    </p>
+                </div>
+                <div id="block11" class="block">
+                    <p align="center">
+                        ここまでIF<br />
+                    </p>
+                </div>
+            </div>
+            <div id="others_area">
+                <div id="help">
+                    <div class="switch_outer">
+                        <div class="toggle_switch"></div>
+                    </div>
+                    <!--
+                    <button class="modal-open js-modal-open">モーダルを開く</button>
+
+                     モーダル本体 -->
+                    <div class="modal js-modal">
+                        <div class="modal-container">
+                            <!-- モーダルを閉じるボタン -->
+                            <div class="modal-close js-modal-close">×</div>
+                            <!-- モーダル内部のコンテンツ -->
+                            <div class="modal-grid-container">
+                                <div class="modal-grid-item" data-id="1" onclick="handleClick(this)">
+                                    問題1
+                                </div>
+                                <div class="modal-grid-item" data-id="2" onclick="handleClick(this)">
+                                    問題2
+                                </div>
+                                <div class="modal-grid-item" data-id="3" onclick="handleClick(this)">
+                                    問題3
+                                </div>
+                                <div class="modal-grid-item" data-id="4" onclick="handleClick(this)">
+                                    問題4
+                                </div>
+                                <div class="modal-grid-item" data-id="5" onclick="handleClick(this)">
+                                    問題5
+                                </div>
+                                <div class="modal-grid-item" data-id="6" onclick="handleClick(this)">
+                                    問題6
+                                </div>
+                                <div class="modal-grid-item" data-id="7" onclick="handleClick(this)">
+                                    問題7
+                                </div>
+                                <div class="modal-grid-item" data-id="8" onclick="handleClick(this)">
+                                    問題8
+                                </div>
+                                <div class="modal-grid-item" data-id="9" onclick="handleClick(this)">
+                                    問題9
+                                </div>
+                                <div class="modal-grid-item" data-id="10" onclick="handleClick(this)">
+                                    問題10
+                                </div>
+                                <div class="modal-grid-item" data-id="11" onclick="handleClick(this)">
+                                    問題11
+                                </div>
+                                <div class="modal-grid-item" data-id="12" onclick="handleClick(this)">
+                                    問題12
+                                </div>
+                                <div class="modal-grid-item" data-id="13" onclick="handleClick(this)">
+                                    問題13
+                                </div>
+                                <div class="modal-grid-item" data-id="14" onclick="handleClick(this)">
+                                    問題14
+                                </div>
+                                <div class="modal-grid-item" data-id="15" onclick="handleClick(this)">
+                                    問題15
+                                </div>
+                                <div class="modal-grid-item" data-id="16" onclick="handleClick(this)">
+                                    問題16
+                                </div>
+                                <div class="modal-grid-item" data-id="17" onclick="handleClick(this)">
+                                    問題17
+                                </div>
+                                <div class="modal-grid-item" data-id="18" onclick="handleClick(this)">
+                                    問題18
+                                </div>
+                                <div class="modal-grid-item" data-id="19" onclick="handleClick(this)">
+                                    問題19
+                                </div>
+                                <div class="modal-grid-item" data-id="20" onclick="handleClick(this)">
+                                    問題20
+                                </div>
+                            </div>
+                            <!--<div class="modal-content">
+                                <p>要素</p>
+                            </div>
+                            <div class="modal-content">
+                                <p>要素</p>
+                            </div>
+                            <div class="modal-content">
+                                <p>要素</p>
+                            </div>
+                            <div class="modal-content">
+                                <p>要素</p>
+                            </div> -->
+                        </div>
+                    </div>
+                    <!--
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <img src="static/assets/turtle.png" id="turtle" style="position: absolute; top: 450px; left: 450px" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript">
+        // ページ読み込み時にクエリパラメータからステージの値を取得
+        window.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const stage = urlParams.get('stage') || '1'; // デフォルト値は '1'
+
+            // アラートを表示
+            alert('ステージ ' + stage + ' に進みます！');
+
+            // 必要に応じて、ステージ値をHTML要素に表示する処理
+            const stageValueElement = document.getElementById('stageValue');
+            if (stageValueElement) {
+                stageValueElement.textContent = stage;
+            }
+        });
+
+        var startx = 450; //初期位置
+        var starty = 450; //初期位置
+        canvrate_x = 900 / window.innerWidth;
+        canvrate_y = 900 / window.innerHeight;
+        let currentX = startx;
+        let currentY = starty;
+        turtle_speed = 10;
+
+        //////////////////
+        ////キャンバス/////
+        //////////////////
+        const canvas = document.querySelector("canvas");
+        const colorPicker = document.getElementById("colorPicker");
+        const ctx = canvas.getContext("2d");
+        var x = (y = a = 0);
+        // 初期の線の色
+        let lineColor = colorPicker.value;
+
+        ctx.fillStyle = "rgb(256, 256, 256)"; // キャンバスの背景色（内側の白色） 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = lineColor;
+
+        // イベントリスナーを追加して色の変更を検知する
+        colorPicker.addEventListener("input", function () {
+            lineColor = colorPicker.value;
+            ctx.strokeStyle = lineColor;
+        });
+
+        document
+            .getElementById("Canvasbody")
+            .addEventListener("click", function (event) {
+                var clickX = event.pageX;
+                var clickY = event.pageY;
+
+                // 要素の位置を取得
+                var clientRect = this.getBoundingClientRect();
+                var positionX = clientRect.left + window.pageXOffset;
+                var positionY = clientRect.top + window.pageYOffset;
+
+                // 要素内におけるクリック位置を計算
+                currentX = clickX - positionX;
+                currentY = clickY - positionY;
+
+                //タートルの位置
+                var turtle = document.getElementById("turtle");
+                //タートル向き
+                var turtle_a = 0;
+                //turtle.style.transform = "translate(225,450px)";
+                const turtleWidth = turtle.offsetWidth;
+                const turtleHeight = turtle.offsetHeight;
+                turtle.style.left = `${currentX + turtleWidth / 2}px`;
+                turtle.style.top = `${currentY}px`;
+            });
+
+        //////////////////
+        //ドラッグ処理開始//
+        //////////////////
+        var code_array = [];
+        for (var i = 0; i < 9; i++) {
+            code_array[i] = 0;
+        }
+        $(function () {
+            var now_object = null;
+
+            $(".block").draggable({
+                // ドラッグ開始時の処理
+                start: function () {
+                    now_object = $(this);
+                    now_object.addClass("block_drag");
+                    now_object.removeClass("block_snap");
+                },
+                //ドラッグ終了時の処理
+                stop: function () {
+                    now_object.removeClass("block_drag");
+                    //配列を作る
+                    create_array();
+                },
+            });
+
+            $(".blocksnap_area").droppable({
+                hoverClass: "block_hover",
+                //ドロップした時
+                drop: function (event, ui) {
+                    now_object.offset({
+                        top: $(this).offset().top,
+                        left: $(this).offset().left - 3,
+                    });
+                    now_object.addClass("block_snap");
+                },
+            });
+
+            //////////////////
+            // 配列を作る ////
+            //////////////////
+            function create_array() {
+                // 各コードエリアとブロックの位置を取得
+                const codearea_top = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().top);
+                const codearea_left = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().left);
+                const blocks_top = Array.from({ length: 11 }, (_, i) => $(`#block${i + 1}`).offset().top);
+                const blocks_left = Array.from({ length: 11 }, (_, i) => $(`#block${i + 1}`).offset().left);
+
+                const size = 11; // 配列の大きさ
+                let array_flag = 0;
+
+                // 上のエリアから順に何のブロックがドロップされているか検知
+                // ブロック1からブロック9まで(1,2,3,4,5,6,7,8,9)を配列に代入
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        if (
+                            codearea_top[i] === blocks_top[j] &&
+                            codearea_left[i] === blocks_left[j] + 3
+                        ) {
+                            code_array[i] = j + 1;
+                            array_flag = 1;
+                            console.log(`X: ${startx + x}, Y: ${starty - y}`);
+                            break; // マッチしたら内側のループを抜ける
+                        }
+                    }
+                    // ブロックを検知できなかった時、0を入れる
+                    if (array_flag === 0) {
+                        code_array[i] = 0;
+                    } else {
+                        array_flag = 0;
+                    }
+                }
+                console.log("配列＝" + code_array);
+            }
+        });
+
+        //////////////////
+        ///// クリア //////
+        //////////////////
+        function clearbtn() {
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgb(256,256,256)";
+        }
+
+        //////////////////
+        ///// 前進 //////
+        //////////////////
+        function fd(step) {
+            return new Promise((resolve) => {
+                function fd_draw() {
+                    if (step > 0) {
+                        const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+                        const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+                        // 境界チェック 
+                        if (nextX <= 0 || nextX >= canvas.width || nextY <= 0 || nextY >= canvas.height) {
+                            // カメがキャンバスの端に到達した場合 
+                            console.log("これ以上進めない");
+                            console.log(`現在位置: X = ${currentX}, Y = ${currentY}`);
+
+
+                            resolve();
+                            return;
+                        }
+                        ctx.beginPath();
+                        ctx.lineWidth = 10;
+                        ctx.moveTo(currentX, currentY);
+                        currentX = nextX;
+                        currentY = nextY;
+                        ctx.lineTo(currentX, currentY);
+                        ctx.stroke();
+
+                        // タートルの位置を更新 
+                        const turtleWidth = turtle.offsetWidth;
+                        const turtleHeight = turtle.offsetHeight;
+                        turtle.style.left = `${currentX + x + turtleWidth / 2}px`;
+                        turtle.style.top = `${currentY - y}px`;
+                        step--;
+
+                        // アニメーションが終了したらresolveを呼び出す 
+                        if (step === 0) {
+                            resolve();
+                        } else {
+                            // アニメーション 
+                            requestAnimationFrame(fd_draw);
+                        }
+                    }
+                }
+                fd_draw();
+            });
+        }
+
+        // 右回転
+        function rt(angle) {
+            a += angle;
+            // タートルの回転角度を更新
+            turtle.style.transform = `rotate(${a}deg)`;
+        }
+
+        // 左回転
+        function lt(angle) {
+            a -= angle;
+            // タートルの回転角度を更新
+            turtle.style.transform = `rotate(${a}deg)`;
+        }
+
+        //////////////////
+        /////スタート//////
+        //////////////////
+
+        var num1 = document.getElementById("number1");
+        var num2 = document.getElementById("number2");
+        var num3 = document.getElementById("number3");
+        var num4 = document.getElementById("number4");
+        var num5 = 0; //document.getElementById("number5");
+        var num6 = document.getElementById("number6");
+        var num7 = document.getElementById("number7");
+        var num8 = document.getElementById("number8");
+        var num9 = document.getElementById("number9");
+        var num10 = 0;
+        var num11 = 0;
+
+        var num_array = [num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11];
+
+        async function start() {
+            x = y = a = 0;
+            turtle_a = 0;
+            turtle.style.transform = `rotate(${a}deg)`;
+            for (var i = 0; i < code_array.length; i++) {
+                i = await processCode(i);
+            }
+        }
+
+
+        async function processCode(index) {
+            const code = code_array[index];
+            console.log(`実行中のブロック：${code} at index ${index}`); // デバッグメッセージ
+            switch (code) {
+                case 1:
+                    await fd(parseFloat(num1.value)); // コード1の場合、fdを実行
+                    break;
+                case 2:
+                    rt(parseFloat(num2.value)); // コード2の場合、rtを実行
+                    break;
+                case 3:
+                    lt(parseFloat(num3.value)); // コード3の場合、ltを実行
+                    break;
+                case 4:
+                    if (code_array.includes(5)) {
+                        const start_loop = index; //start_loopに現在のインデックス
+                        const end_loop = code_array.indexOf(5); // end_eleに5のインデックス
+
+                        // 繰り返しの始めが終わりよりも配列の後ろにある時
+                        if (end_loop < start_loop) {
+                            alert("順番がおかしい");
+                            return end_loop; //エラー時、ループの後までスキップ
+                        }
+
+                        for (let j = 1; j <= parseFloat(num4.value); j++) {
+                            for (let k = start_loop + 1; k < end_loop; k++) {
+                                await processCode(k);
+                            }
+                        }
+                        return end_loop; //5の次のインデックスにジャンプ
+                    } else {
+                        alert("繰り返しの終端が必要");
+                    }
+                    break;
+                case 6:
+                    await fd(parseFloat(num6.value)); // コード6の場合、fdを実行
+                    break;
+                case 7:
+                    await fd(parseFloat(num7.value)); // コード7の場合、fdを実行
+                    break;
+                case 8:
+                    rt(parseFloat(num8.value)); // コード8の場合、rtを実行
+                    break;
+                case 9:
+                    lt(parseFloat(num9.value)); // コード9の場合、ltを実行
+                    break;
+                case 10:
+                    if (code_array.includes(11)) {
+                        const start_if = index;
+                        const end_if = code_array.indexOf(11);
+
+                        //終端ブロックが手前にあったら
+                        if (end_if < start_if) {
+                            alert("順番がおかしい");
+                            return end_if;
+                        }
+
+                        console.log(`現在位置: X = ${currentX}, Y = ${currentY}`);
+                        const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+                        const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+                        if (nextX <= 0 || nextX >= canvas.width || nextY <= 0 || nextY >= canvas.height) {
+                            console.log("カメがキャンバスの端に到達しました");
+
+                            // IF条件が真の場合、指定したコードブロックを実行 
+                            for (let k = start_if + 1; k < end_if; k++) {
+                                k = await processCode(k);
+                                console.log(`実行中のネストされたブロック：${code_array[k]} at index ${k}`);
+                            }
+                        } else {
+                            console.log("カメはキャンバスの端に到達していません");
+                        }
+                        return end_if;
+                    } else {
+                        alert("IFの終端が必要");
+                    }
+                    break;
+
+                case 11:
+                    break; // 終端
+                default:
+                    break;
+            }
+            return index; // 次のインデックスに進む
+        }
+
+
+
+        //トグルスイッチの状態
+        let togglestate = 0;
+        //トグルスイッチ
+        const switchOuter = document.querySelector(".switch_outer");
+        const toggleSwitch = document.querySelector(".toggle_switch");
+
+        //チェックボタン取得
+        var checkButton = document.getElementById("checkButton");
+
+        //要素を取得
+        const modal = document.querySelector(".js-modal"),
+            open = document.querySelector(".js-modal-open"),
+            close = document.querySelector(".js-modal-close");
+
+        //クリックでacitveクラスを追加/削除
+        switchOuter.addEventListener("click", () => {
+            switchOuter.classList.toggle("active");
+            toggleSwitch.classList.toggle("active");
+            if (togglestate == 0) {
+                togglestate = 1;
+                modal.classList.add("is-active");
+                checkButton.style.visibility = "visible";
+                //  open.addEventListener('click', modalOpen);
+            } else {
+                togglestate = 0;
+                modal.classList.remove("is-active");
+                checkButton.style.visibility = "hidden";
+                document.getElementById("overlayImage").src = "";
+                //close.addEventListener('click', modalClose);
+            }
+        });
+
+        let imgnum = 0;
+        //要素をクリック
+        function handleClick(element) {
+            // クリックされた要素のdata-id属性値を取得
+            var id = parseInt(element.getAttribute("data-id"));
+            //要素をクリックしてモーダルを閉じる
+            modal.classList.remove("is-active");
+            // Switch文で処理を分けます
+            const messages = {
+                1: "要素1がクリックされました。",
+                2: "要素2がクリックされました。",
+                3: "要素3がクリックされました。",
+                4: "要素4がクリックされました。",
+                5: "要素5がクリックされました。",
+                6: "要素6がクリックされました。",
+                7: "要素7がクリックされました。",
+                8: "要素8がクリックされました。",
+                9: "要素9がクリックされました。",
+                10: "要素10がクリックされました。",
+                11: "要素11がクリックされました。",
+                12: "要素12がクリックされました。",
+                13: "要素13がクリックされました。",
+                14: "要素14がクリックされました。",
+                15: "要素15がクリックされました。",
+                16: "要素16がクリックされました。",
+                17: "要素17がクリックされました。",
+                18: "要素18がクリックされました。",
+                19: "要素19がクリックされました。",
+                20: "要素20がクリックされました。",
+                21: "要素21がクリックされました。",
+            };
+
+            const defaultMessage = "その他の要素がクリックされました.";
+
+            const alertMessage = messages[id] || defaultMessage;
+            alert(alertMessage);
+            imgnum = id;
+
+            displayCanvasImage(imgnum);
+        }
+
+        //「閉じるボタン」をクリックしてモーダルを閉じる
+        close.addEventListener("click", modalClose);
+        function modalClose() {
+            modal.classList.remove("is-active");
+            switchOuter.classList.toggle("active");
+            toggleSwitch.classList.toggle("active");
+            togglestate = 0;
+            checkButton.style.visibility = "hidden";
+            document.getElementById("overlayImage").src = "";
+        }
+
+        //「モーダルの外側」をクリックしてモーダルを閉じる
+        function modalOut(e) {
+            if (e.target == modal) {
+                modal.classList.remove("is-active");
+            }
+        }
+        //close.addEventListener('click', modalOut);
+
+        function displayCanvasImage(imgnum) {
+            // 画像のパスを構築
+            var imagePath = `static/assets/canvas_${imgnum}.png`;
+            document.getElementById("overlayImage").src = imagePath;
+        }
+
+        //////////////////////////////////////////////////
+        ////////////pythonデータ受け渡し///////////////////
+        //////////////////////////////////////////////////
+        function check() {
+            const imageData = ctx.getImageData(
+                10,
+                10,
+                canvas.width - 20,
+                canvas.height - 20
+            );
+            // Canvasを作成し、取得した画像データを描画
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = imageData.width;
+            tempCanvas.height = imageData.height;
+            tempCtx.putImageData(imageData, 0, 0);
+            // ImageDataをBase64に変換
+            const base64Image = tempCanvas.toDataURL("image/png");
+
+            // 送信するデータをオブジェクトにまとめる
+            const sendData = {
+                imgnumData: imgnum,
+                imageData: base64Image.toString()  // toString() を追加
+            };
+
+            fetch("/match_images", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // 0.2より小さいなら失敗
+                    if (data.matchingValue < 0.2) {
+                        alert("不正解！");
+                    } else {
+                        alert("正解！");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Error occurred during matching.");
+                });
+        }
+    </script>
+</body>
+
+</html>
