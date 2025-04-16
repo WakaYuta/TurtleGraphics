@@ -26,6 +26,9 @@
                         <label class="color-picker-label" for="colorPicker">Color Picker:</label>
                         <input class="color-picker" type="color" id="colorPicker" value="#000000" />
                     </div>
+                    <button class="btn btn_check" type="button" id="blockGenerateButton" onclick="block_Generate()">
+                        Generate
+                    </button>
                     <button class="btn" type="button" id="checkButton" onclick="grid()">
                         GridONOFF
                     </button>
@@ -176,6 +179,38 @@
                 stageValueElement.textContent = stage;
             }
         });
+
+        let imageCounter = 0;
+        function block_Generate() {
+            const canvasWrapper = document.getElementById('canvas_wrapper');
+            const canvas = document.getElementById('mainCanvas');
+            const img = document.createElement('img');
+            img.src = 'static/assets/Obstacle.png';
+            img.classList.add('draggable');
+
+            // 画像サイズ
+            img.width = 50;
+            img.height = 50;
+
+            // キャンバス内の座標系に合わせて配置
+            const gridSize = 50;
+            const cols = Math.floor(canvas.width / gridSize);
+            const x = (imageCounter % cols) * gridSize;
+            const y = Math.floor(imageCounter / cols) * gridSize;
+
+            img.style.position = 'absolute'; // ←これが必須！！
+            img.style.left = `${canvas.offsetLeft + x}px`;
+            img.style.top = `${canvas.offsetTop + y}px`;
+
+            canvasWrapper.appendChild(img);
+            imageCounter++;
+
+            // jQuery UI でドラッグ可能に
+            $(img).draggable({
+                containment: '#canvas_wrapper'
+            });
+        }
+
 
         // 課題図形の表示
         function displayCanvasImage(imgnum) {
