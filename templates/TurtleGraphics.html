@@ -710,9 +710,13 @@
             }
         });
 
-        // 実行
         window.addEventListener("DOMContentLoaded", () => {
-            intro.start();
+            const urlParams = new URLSearchParams(window.location.search);
+            const stage = urlParams.get('stage') || '1';
+
+            if (stage === '1') {
+                intro.start();  // チュートリアル開始
+            }
         });
     </script>
 </body>
