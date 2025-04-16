@@ -26,9 +26,9 @@
                         <label class="color-picker-label" for="colorPicker">Color Picker:</label>
                         <input class="color-picker" type="color" id="colorPicker" value="#000000" />
                     </div>
-                    <button class="btn btn_check" type="button" id="blockGenerateButton" onclick="block_Generate()">
+                    <!-- <button class="btn btn_check" type="button" id="blockGenerateButton" onclick="block_Generate()">
                         Generate
-                    </button>
+                    </button> -->
                     <button class="btn" type="button" id="checkButton" onclick="grid()">
                         GridONOFF
                     </button>
@@ -210,7 +210,6 @@
                 containment: '#canvas_wrapper'
             });
         }
-
 
         // 課題図形の表示
         function displayCanvasImage(imgnum) {
@@ -560,12 +559,14 @@
 
         intro.setOptions({
             showProgress: false,
+            hidePrev: true,
+            hideNext: true,
             disableInteraction: true,
             exitOnEsc: false,
             exitOnOverlayClick: false,
             nextLabel: "次へ",
             prevLabel: "戻る",
-            doneLabel: "チュートリアルを終わる",
+            doneLabel: "完了",
             steps: [
                 {
                     intro: "このチュートリアルでは、このアプリの使い方を順番にご案内します！<br>一緒に画面を見ながら進めてみましょう。",
