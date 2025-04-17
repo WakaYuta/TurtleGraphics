@@ -15,6 +15,7 @@
             <div id="canvas_area">
                 <div id="taskname">{{ title }}</div>
                 <div id="canvas_wrapper">
+                    <div id="answer-mark" class="mark-icon">〇</div>
                     <div data-step='1' data-intro='Help Text First!!'>
                         <canvas id="mainCanvas" width="700" height="700"></canvas>
                     </div>
@@ -66,11 +67,13 @@
             </div>
             <div id="others_area">
                 <div id="help">
-                    <!--
-                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
-                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
-                    <button class="btn btn_help" type="button" onclick="help()">Help</button>
-                    -->
+
+                    <!-- <button class="btn btn_help" type="button" onclick="help()">Help</button> -->
+                    <button id="btn_next" class="btn_next" type="button" onclick="next_stage()">next</button>
+
+                    <!-- <button class="btn btn_help" type="button" onclick="help()">Help</button>
+                    <button class="btn btn_help" type="button" onclick="help()">Help</button> -->
+
                 </div>
             </div>
         </div>
@@ -336,8 +339,8 @@
                 gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height);
                 flag = true;
             }
-
         }
+
         //////////////////
         ///// クリア //////
         //////////////////
@@ -536,18 +539,23 @@
             })
                 .then(response => response.json())
                 .then(data => {
-                    // 0.2より小さいなら失敗
-                    if (data.matchingValue < 0.2) {
-                        alert("不正解！" + data.matchingValue);
-                    } else {
-                        alert("正解！" + data.matchingValue);
+                    const isCorrect = data.matchingValue >= 0.2;
+                    showAnswerMark(isCorrect);
+
+                    if (isCorrect) {
+                        const nextButton = document.getElementById("btn_next");
+                        if (nextButton) {
+                            nextButton.style.visibility = "visible";
+                        }
                     }
                 })
                 .catch(error => {
                     console.error("Error:", error);
-                    alert("Error occurred during matching.");
+                    showAnswerMark(false);
                 });
         }
+
+
 
         let intro = introJs();
         let turtlePositionSet = false;
@@ -559,8 +567,6 @@
 
         intro.setOptions({
             showProgress: false,
-            hidePrev: true,
-            hideNext: true,
             disableInteraction: true,
             exitOnEsc: false,
             exitOnOverlayClick: false,
@@ -596,7 +602,7 @@
                     intro: "図形が完成したら、このボタンで答え合わせができます。",
                 },
                 {
-                    intro: "では実際にやってみましょう！<br>まずはカメを直線で動かしてみます。",
+                    intro: "では実際にやってみましょう！<br>まずはカメで直線を描いていきます。",
                 },
                 {
                     element: "#canvas_wrapper",
@@ -632,7 +638,7 @@
                 },
                 {
                     element: "body",
-                    intro: "「正解！」と表示されましたか？",
+                    intro: "〇が表示されましたか？",
                 },
                 {
                     element: "body",
@@ -718,6 +724,17 @@
                 intro.start();  // チュートリアル開始
             }
         });
+        function showAnswerMark(isCorrect) {
+            const mark = document.getElementById("answer-mark");
+            mark.textContent = isCorrect ? "〇" : "×";
+            mark.style.color = isCorrect ? "green" : "red";
+            mark.style.opacity = 1;
+
+            setTimeout(() => {
+                mark.style.opacity = 0;
+            }, 1500);
+        }
+
     </script>
 </body>
 

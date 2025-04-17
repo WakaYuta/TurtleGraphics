@@ -47,6 +47,21 @@ body {
     margin: 20px;
 }
 
+.mark-icon {
+    position: absolute;
+    font-size: 500px;
+    font-weight: bold;
+    color: green;
+    /* 正解は緑、×のときは JS 側で赤に変える */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+}
+
 #mainCanvas {
     display: block;
     inset: 0;
@@ -151,14 +166,6 @@ body {
 /* .btn_start {
 
 } */
-
-.btn_help {
-    border-radius: 1000px;
-    width: 90px;
-    height: 90px;
-    margin: 10px auto;
-}
-
 #block_area {
     width: 300px;
     height: auto;
@@ -217,6 +224,27 @@ input[type=number]::-webkit-outer-spin-button {
     height: auto;
     margin: 20px auto;
 }
+
+.btn_help {
+    border-radius: 1000px;
+    width: 90px;
+    height: 90px;
+    margin: 10px auto;
+}
+
+.btn_next {
+    border-radius: 1000px;
+    width: 90px;
+    height: 90px;
+    margin: 10px auto;
+    cursor: pointer;
+    font-size: 30px;
+    background-color: #e3fffa;
+    font-family: "Kosugi", sans-serif;
+    visibility: hidden;
+}
+
+
 
 
 @media screen and (max-width: 1000px) {}
