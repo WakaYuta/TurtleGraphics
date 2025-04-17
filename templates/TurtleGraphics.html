@@ -69,6 +69,7 @@
                 <div id="help">
 
                     <!-- <button class="btn btn_help" type="button" onclick="help()">Help</button> -->
+                    <button id="btn_menu" class="btn_menu" type="button" onclick="return_menu()">menu</button>
                     <button id="btn_next" class="btn_next" type="button" onclick="next_stage()">next</button>
 
                     <!-- <button class="btn btn_help" type="button" onclick="help()">Help</button>
@@ -555,7 +556,16 @@
                 });
         }
 
+        function next_stage() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentStage = parseInt(urlParams.get("stage") || "1");
+            const nextStage = currentStage + 1;
+            window.location.href = `/TurtleGraphics?stage=${nextStage}`;
+        }
 
+        function return_menu() {
+            window.location.href = '/';
+        }
 
         let intro = introJs();
         let turtlePositionSet = false;
