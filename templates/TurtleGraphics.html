@@ -574,166 +574,200 @@
         let paintdone = false;
         let chekdone = false;
 
+        const steps_stage1 = [
+            {
+                intro: "このチュートリアルでは、このアプリの使い方を順番にご案内します！<br>一緒に画面を見ながら進めてみましょう。",
+            },
+            {
+                element: "#canvas_wrapper",
+                intro: "ここがカメのキャンバスです。<br>課題の図形も薄く表示されるので、なぞるように描いていきます。<br>1マス分の大きさ＝カメが100歩進んだ距離になっています。",
+            },
+            {
+                element: "#turtle",
+                intro: "このカメが、あなたの命令にしたがって線を引いてくれます。<br>キャンバスをクリックして、スタート位置を決めてあげましょう！",
+            },
+            {
+                element: "#block_area",
+                intro: "ここにあるのが命令ブロックです。<br>カメに『どう動くか』を伝えるために使います。",
+            },
+            {
+                element: "#code_area",
+                intro: "ここがプログラムを書く場所です。<br>命令ブロックを順番に並べると、カメがその通りに動きます。",
+            },
+            {
+                element: "#btn_start",
+                intro: "準備ができたら、ここをクリックするとカメが動き出します！",
+            },
+            {
+                element: "#btn_check",
+                intro: "図形が完成したら、このボタンで答え合わせができます。",
+            },
+            {
+                intro: "では実際にやってみましょう！<br>まずはカメで直線を描いていきます。",
+            },
+            {
+                element: "#canvas_wrapper",
+                intro: "キャンバスをクリックして、カメのスタート位置を決めてください。",
+            },
+            {
+                element: "body",
+                intro: "次に「〇歩進む」ブロックを使って、まっすぐ線を引いてみましょう。",
+            },
+            {
+                element: "#block1",
+                intro: "この「歩進む」ブロックを、中央のプログラムエリアにドラッグしてください。",
+            },
+            {
+                element: "#number1",
+                intro: "数字を入力します。課題と同じ長さになるように、ここでは「300」と入れてみましょう。",
+            },
+            {
+                element: "body",
+                intro: "OK！ブロックが完成しましたね。",
+            },
+            {
+                element: "#btn_start",
+                intro: "それでは「スタート」ボタンをクリックしてみましょう！",
+            },
+            {
+                element: "body",
+                intro: "カメが動いて線が引けましたか？",
+            },
+            {
+                element: "#btn_check",
+                intro: "今描いた線が正しいか確認してみましょう。「チェック」ボタンをクリック！",
+            },
+            {
+                element: "body",
+                intro: "〇が表示されましたか？",
+            },
+            {
+                element: "body",
+                intro: "これがこのアプリの基本の使い方です。",
+            },
+            {
+                element: "#btn_next",
+                intro: "NEXTを押して次の問題にも挑戦してみてください！",
+            }
+        ];
 
-        intro.setOptions({
-            showProgress: false,
-            disableInteraction: true,
-            exitOnEsc: false,
-            exitOnOverlayClick: false,
-            nextLabel: "次へ",
-            prevLabel: "戻る",
-            doneLabel: "完了",
-            steps: [
-                {
-                    intro: "このチュートリアルでは、このアプリの使い方を順番にご案内します！<br>一緒に画面を見ながら進めてみましょう。",
-                },
-                {
-                    element: "#canvas_wrapper",
-                    intro: "ここがカメのキャンバスです。<br>課題の図形も薄く表示されるので、なぞるように描いていきます。<br>1マス分の大きさ＝カメが100歩進んだ距離になっています。",
-                },
-                {
-                    element: "#turtle",
-                    intro: "このカメが、あなたの命令にしたがって線を引いてくれます。<br>キャンバスをクリックして、スタート位置を決めてあげましょう！",
-                },
-                {
-                    element: "#block_area",
-                    intro: "ここにあるのが命令ブロックです。<br>カメに『どう動くか』を伝えるために使います。",
-                },
-                {
-                    element: "#code_area",
-                    intro: "ここがプログラムを書く場所です。<br>命令ブロックを順番に並べると、カメがその通りに動きます。",
-                },
-                {
-                    element: "#btn_start",
-                    intro: "準備ができたら、ここをクリックするとカメが動き出します！",
-                },
-                {
-                    element: "#btn_check",
-                    intro: "図形が完成したら、このボタンで答え合わせができます。",
-                },
-                {
-                    intro: "では実際にやってみましょう！<br>まずはカメで直線を描いていきます。",
-                },
-                {
-                    element: "#canvas_wrapper",
-                    intro: "キャンバスをクリックして、カメのスタート位置を決めてください。",
-                },
-                {
-                    element: "body",
-                    intro: "次に「〇歩進む」ブロックを使って、まっすぐ線を引いてみましょう。",
-                },
-                {
-                    element: "#block1",
-                    intro: "この「歩進む」ブロックを、中央のプログラムエリアにドラッグしてください。",
-                },
-                {
-                    element: "#number1",
-                    intro: "数字を入力します。課題と同じ長さになるように、ここでは「300」と入れてみましょう。",
-                },
-                {
-                    element: "body",
-                    intro: "OK！ブロックが完成しましたね。",
-                },
-                {
-                    element: "#btn_start",
-                    intro: "それでは「スタート」ボタンをクリックしてみましょう！",
-                },
-                {
-                    element: "body",
-                    intro: "カメが動いて線が引けましたか？",
-                },
-                {
-                    element: "#btn_check",
-                    intro: "今描いた線が正しいか確認してみましょう。「チェック」ボタンをクリック！",
-                },
-                {
-                    element: "body",
-                    intro: "〇が表示されましたか？",
-                },
-                {
-                    element: "body",
-                    intro: "これがこのアプリの基本の使い方です。<br>次の問題にも挑戦してみてください！",
-                },
-            ]
-        });
+        const steps_stage2 = [
+            {
+                element: "body",
+                intro: "次は三角形を描いてみましょう！",
+            },
+            {
+                element: "#block_area",
+                intro: "使えるブロックが増えました。",
+            },
+        ];
+
 
 
         //一時停止用の制御
         intro.onafterchange(function (targetElement) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const stage = urlParams.get('stage') || '1';
             const currentStep = intro._currentStep;
+            if (stage === '1') {
+                if (currentStep === 9 && !turtlePositionSet) {
+                    intro.exit();
 
-            if (currentStep === 9 && !turtlePositionSet) {
-                intro.exit();
+                    //ユーザーがキャンバスをクリックするのを待つ
+                    const canvas = document.getElementById("canvas_wrapper");
+                    const handler = () => {
+                        turtlePositionSet = true;
+                        canvas.removeEventListener("click", handler);
+                        intro.goToStep(10);
+                    };
 
-                //ユーザーがキャンバスをクリックするのを待つ
-                const canvas = document.getElementById("canvas_wrapper");
-                const handler = () => {
-                    turtlePositionSet = true;
-                    canvas.removeEventListener("click", handler);
-                    intro.goToStep(10);
-                };
+                    canvas.addEventListener("click", handler);
+                }
+                if (currentStep === 11 && !blockSet) {
+                    intro.exit();
 
-                canvas.addEventListener("click", handler);
-            }
-            if (currentStep === 11 && !blockSet) {
-                intro.exit();
+                    //ユーザーがブロックを配置するのを待つ
+                    document.addEventListener('codeArrayChanged', function checkFdBlock() {
+                        if (code_array[0][0] === "fd") {
+                            blockSet = true;
+                            document.removeEventListener('codeArrayChanged', checkFdBlock);
+                            intro.goToStep(12);
+                        }
+                    });
+                }
+                if (currentStep === 12 && !numSet) {
+                    intro.exit();
+                    const numberInput = document.getElementById("number1");
 
-                //ユーザーがブロックを配置するのを待つ
-                document.addEventListener('codeArrayChanged', function checkFdBlock() {
-                    if (code_array[0][0] === "fd") {
-                        blockSet = true;
-                        document.removeEventListener('codeArrayChanged', checkFdBlock);
-                        intro.goToStep(12);
-                    }
-                });
-            }
-            if (currentStep === 12 && !numSet) {
-                intro.exit();
-                const numberInput = document.getElementById("number1");
+                    // ユーザーの数値入力を待つ
+                    const inputHandler = function () {
+                        if (numberInput.value === "300") {
+                            numSet = true;
+                            numberInput.removeEventListener("input", inputHandler);
+                            intro.goToStep(13);
+                        }
+                    };
 
-                // ユーザーの数値入力を待つ
-                const inputHandler = function () {
-                    if (numberInput.value === "300") {
-                        numSet = true;
-                        numberInput.removeEventListener("input", inputHandler);
-                        intro.goToStep(13);
-                    }
-                };
+                    // 入力フィールドの変更を監視
+                    numberInput.addEventListener("input", inputHandler);
+                }
+                if (currentStep === 14 && !paintdone) {
+                    intro.exit();
+                    //ユーザーが描画完了するのを待つ
+                    document.addEventListener('paintdone', function checkpaintdone() {
+                        paintdone = true;
+                        document.removeEventListener('paintdone', checkpaintdone);
+                        intro.goToStep(15);
+                    });
+                }
+                if (currentStep === 16 && !chekdone) {
+                    intro.exit();
+                    //ユーザーがチェック完了を待つ
+                    const checkbtn = document.getElementById("btn_check");
+                    const handler = () => {
+                        chekdone = true;
+                        checkbtn.removeEventListener("click", handler);
+                        intro.goToStep(17);
+                    };
 
-                // 入力フィールドの変更を監視
-                numberInput.addEventListener("input", inputHandler);
-            }
-            if (currentStep === 14 && !paintdone) {
-                intro.exit();
-                //ユーザーが描画完了するのを待つ
-                document.addEventListener('paintdone', function checkpaintdone() {
-                    paintdone = true;
-                    document.removeEventListener('paintdone', checkpaintdone);
-                    intro.goToStep(15);
-                });
-            }
-            if (currentStep === 16 && !chekdone) {
-                intro.exit();
-                //ユーザーがチェック完了を待つ
-                const checkbtn = document.getElementById("btn_check");
-                const handler = () => {
-                    chekdone = true;
-                    checkbtn.removeEventListener("click", handler);
-                    intro.goToStep(17);
-                };
-
-                checkbtn.addEventListener("click", handler);
+                    checkbtn.addEventListener("click", handler);
+                }
             }
         });
 
         window.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
             const stage = urlParams.get('stage') || '1';
-
-            if (stage === '1') {
-                intro.start();  // チュートリアル開始
+            let steps;
+            switch (stage) {
+                case '2':
+                    steps = steps_stage2;
+                    break;
+                case '3':
+                    steps = steps_stage3;
+                    break;
+                case '4':
+                    steps = steps_stage4;
+                    break;
+                default:
+                    steps = steps_stage1;
+                    break;
             }
+            intro.setOptions({
+                showProgress: false,
+                disableInteraction: true,
+                exitOnEsc: false,
+                exitOnOverlayClick: false,
+                nextLabel: "次へ",
+                prevLabel: "戻る",
+                doneLabel: "完了",
+                steps: steps
+            });
+
+            intro.start();
         });
+
+
         function showAnswerMark(isCorrect) {
             const mark = document.getElementById("answer-mark");
             mark.textContent = isCorrect ? "〇" : "×";
