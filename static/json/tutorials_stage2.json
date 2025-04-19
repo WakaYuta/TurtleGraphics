@@ -1,0 +1,10 @@
+[
+    {
+       "element": "body",
+        "intro": "次は三角形を描いてみましょう！"
+    },
+    {
+        "element": "#block_area",
+        "intro": "使えるブロックが増えました。"
+    }
+]
