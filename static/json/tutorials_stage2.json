@@ -6,5 +6,25 @@
     {
         "element": "#block_area",
         "intro": "使えるブロックが増えました。"
+    },
+    {
+        "element": "#block4",
+        "intro": "これはカメの向きを変えるブロックです。"
+    },
+    {
+        "element": "#code_area",
+        "intro": "上から順番に実行されるので順番に注意してください！"
+    },
+    {
+        "element": "body",
+        "intro": "では、ブロックを組み立てて三角形を描いてみましょう！"
+    },
+    {
+        "element": "body",
+        "intro": "OK!正しい順番にブロックを配置して三角形を描けましたね！"
+    },
+    {
+        "element": "#btn_next",
+        "intro": "NEXTを押して次の問題に挑戦してください！"
     }
 ]

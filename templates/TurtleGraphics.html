@@ -544,6 +544,9 @@
                     showAnswerMark(isCorrect);
 
                     if (isCorrect) {
+                        const event = new CustomEvent('trianglecorrect');
+                        document.dispatchEvent(event);
+
                         const nextButton = document.getElementById("btn_next");
                         if (nextButton) {
                             nextButton.style.visibility = "visible";
@@ -573,6 +576,7 @@
         let numSet = false;
         let paintdone = false;
         let chekdone = false;
+        let trianglecorrect = false;
 
         //一時停止用の制御
         intro.onafterchange(function (targetElement) {
@@ -641,6 +645,17 @@
                     };
 
                     checkbtn.addEventListener("click", handler);
+                }
+            }
+            else if (stage === '2') {
+                if (currentStep === 5 && !trianglecorrect) {
+                    intro.exit();
+                    //ユーザーが三角形を描画するのを待つ
+                    document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+                        trianglecorrect = true;
+                        document.removeEventListener('trianglecorrect', checktrianglecorrect);
+                        intro.goToStep(6).start();
+                    });
                 }
             }
         });
