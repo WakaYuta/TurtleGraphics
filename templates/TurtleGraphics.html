@@ -621,6 +621,8 @@
         let chekdone = false;
         let trianglecorrect1 = false;
         let trianglecorrect2 = false;
+        let trianglecorrect3 = false;
+        let obstacleSet = false;
 
         //一時停止用の制御
         intro.onafterchange(function (targetElement) {
@@ -710,6 +712,28 @@
                         trianglecorrect2 = true;
                         document.removeEventListener('trianglecorrect', checktrianglecorrect);
                         intro.goToStep(6).start();
+                    });
+                }
+            }
+            else if (stage === '4') {
+                if (currentStep === 5 && !obstacleSet) {
+                    intro.exit();
+                    // ユーザーが障害物を生成するのを待つ
+                    const generatebutton = document.getElementById("blockGenerateButton");
+                    const handler = () => {
+                        obstacleSet = true; // フラグを更新
+                        generatebutton.removeEventListener("click", handler); // イベントリスナーを削除
+                        intro.goToStep(6); // 次のステップに進む
+                    };
+                    generatebutton.addEventListener("click", handler); // イベントリスナーを追加
+                }
+                if (currentStep === 9 && !trianglecorrect3) {
+                    intro.exit();
+                    //ユーザーが三角形を描画するのを待つ
+                    document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+                        trianglecorrect3 = true;
+                        document.removeEventListener('trianglecorrect', checktrianglecorrect);
+                        intro.goToStep(10).start();
                     });
                 }
             }

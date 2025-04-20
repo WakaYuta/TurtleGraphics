@@ -135,7 +135,7 @@ def turtle_graphics():
         'TurtleGraphics.html',
         blocks_html=blocks_html,
         generate_html=generate_html,
-        total_blocks=total_blocks,  # ブロックの総数を追加
+        total_blocks=total_blocks,
         title=stage_info.get("title", "課題"),
         image=stage_info.get("image", "canvas_default.png")
     )
@@ -144,20 +144,23 @@ def turtle_graphics():
 def match_images():
     try:
         data = request.json
-        imgnum = int(data.get('imgnumData', '1'))
+        imgnum = str(data.get('imgnumData', '1'))
         imageData_base64 = data.get('imageData')
 
         img1 = cv2.imdecode(np.frombuffer(base64.b64decode(imageData_base64.split(',')[1]), np.uint8), cv2.IMREAD_COLOR)
         if img1 is None:
             return jsonify({'matchingValue': 0.0})
 
-        if 1 <= imgnum <= 20:
-            img2 = cv2.imread(f'static/assets/canvas_{imgnum}.png')
-        else:
-            img2 = cv2.imread('static/assets/canvas_default.png')
+        # ステージ画像ファイル名を取得
+        stage_info = STAGE_DATA.get(imgnum, {})
+        image_filename = stage_info.get("image", "canvas_default.png")
+
+        # 正しい画像を読み込む
+        img2 = cv2.imread(f'static/assets/{image_filename}')
         if img2 is None:
             return jsonify({'matchingValue': 0.0})
 
+        # 比較処理
         gray1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
         gray2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
 
@@ -178,6 +181,7 @@ def match_images():
     except Exception as e:
         print("Error in /match_images:", e)
         return jsonify({'matchingValue': 0.0})
+
 
 #直接実行時のみ起動
 if __name__ == '__main__':

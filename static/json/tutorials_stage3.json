@@ -1,30 +1,30 @@
 [
     {
         "element": "body",
-        "intro": "次は繰り返しを使って三角形を描いてみましょう！"
+        "intro": "次は「繰り返し」を使って、三角形を描いてみましょう！"
     },
     {
         "element": "#block3",
-        "intro": "使えるブロックが増えました。"
+        "intro": "新しく使えるブロックが増えました。"
     },
     {
         "element": "#block4",
-        "intro": "使えるブロックが増えました。"
+        "intro": "こちらも新しいブロックです。あとで使ってみましょう。"
     },
     {
         "element": "body",
-        "intro": "<p>この二つのブロックでほかのブロックを挟むことで指定した回数だけ繰り返すことができます。</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
+        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
     },
     {
         "element": "body",
-        "intro": "では、ブロックを組み立てて三角形を描いてみましょう！"
+        "intro": "それでは、ブロックを組み立てて三角形を描いてみましょう！"
     },
     {
         "element": "body",
-        "intro": "OK!繰り返しの概念がわかりましたか？"
+        "intro": "どうですか？繰り返しの使い方がわかってきましたか？"
     },
     {
         "element": "#btn_next",
-        "intro": "NEXTを押して次の問題に挑戦してください！"
+        "intro": "「NEXT」をクリックして、つぎのステージに進みましょう！"
     }
 ]

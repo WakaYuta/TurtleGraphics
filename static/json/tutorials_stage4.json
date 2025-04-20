@@ -4,16 +4,32 @@
         "intro": "次は分岐を使って三角形を描いてみましょう！"
     },
     {
-        "element": "#block3",
+        "element": "#block5",
         "intro": "使えるブロックが増えました。"
     },
     {
-        "element": "#block4",
+        "element": "#block6",
         "intro": "使えるブロックが増えました。"
     },
     {
         "element": "body",
-        "intro": "この二つのブロックでほかのブロックを挟むことで指定した回数だけ繰り返すことができます。"
+        "intro": "<p>この二つのブロックでほかのブロックを挟むことでカメが壁や障害物にぶつかったときの動作を指定できます。</p><img src='/static/assets/c4_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
+    },
+    {
+        "element": "#blockGenerateButton",
+        "intro": "このボタンを押すと、障害物を出すことができます。試しに出してみましょう！"
+    },
+    {
+        "element": "body",
+        "intro": "<p>障害物は自由に動かすことができます！</p><img src='/static/assets/c4_gif.gif' style='width: 150px; display: block; margin: 8px auto;'>"
+    },
+    {
+        "element": "#block1",
+        "intro": "このブロックは、999歩で決まっています。"
+    },
+    {
+        "element": "body",
+        "intro": "歩数が決まっていないとき、どうやって三角形をかけるかな？"
     },
     {
         "element": "body",
@@ -21,10 +37,6 @@
     },
     {
         "element": "body",
-        "intro": "OK!繰り返しの概念がわかりましたか？"
-    },
-    {
-        "element": "#btn_next",
-        "intro": "NEXTを押して次の問題に挑戦してください！"
+        "intro": "OK!分岐の使い方がわかりましたか？"
     }
 ]
