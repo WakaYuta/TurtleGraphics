@@ -1,7 +1,7 @@
 [
     {
-        "element": "body",
-        "intro": "次は繰り返しを使って三角形を描いてみましょう！"
+       "element": "body",
+        "intro": "次は分岐を使って三角形を描いてみましょう！"
     },
     {
         "element": "#block3",
@@ -13,7 +13,7 @@
     },
     {
         "element": "body",
-        "intro": "<p>この二つのブロックでほかのブロックを挟むことで指定した回数だけ繰り返すことができます。</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
+        "intro": "この二つのブロックでほかのブロックを挟むことで指定した回数だけ繰り返すことができます。"
     },
     {
         "element": "body",

@@ -27,9 +27,7 @@
                         <label class="color-picker-label" for="colorPicker">Color Picker:</label>
                         <input class="color-picker" type="color" id="colorPicker" value="#000000" />
                     </div>
-                    <!-- <button class="btn btn_check" type="button" id="blockGenerateButton" onclick="block_Generate()">
-                        Generate
-                    </button> -->
+                    {{ generate_html|safe }}
                     <button class="btn" type="button" id="checkButton" onclick="grid()">
                         GridONOFF
                     </button>
@@ -71,9 +69,6 @@
                     <!-- <button class="btn btn_help" type="button" onclick="help()">Help</button> -->
                     <button id="btn_menu" class="btn_menu" type="button" onclick="return_menu()">menu</button>
                     <button id="btn_next" class="btn_next" type="button" onclick="next_stage()">next</button>
-
-                    <!-- <button class="btn btn_help" type="button" onclick="help()">Help</button>
-                    <button class="btn btn_help" type="button" onclick="help()">Help</button> -->
 
                 </div>
             </div>
@@ -176,13 +171,13 @@
         window.addEventListener('DOMContentLoaded', function () {
             const urlParams = new URLSearchParams(window.location.search);
             const stage = urlParams.get('stage') || '1';
-            const imgnum = stage;
-            displayCanvasImage(imgnum);
             const stageValueElement = document.getElementById('stageValue');
             if (stageValueElement) {
                 stageValueElement.textContent = stage;
             }
         });
+
+        const obstacles = []; // 障害物を格納する配列を初期化
 
         let imageCounter = 0;
         function block_Generate() {
@@ -202,27 +197,18 @@
             const x = (imageCounter % cols) * gridSize;
             const y = Math.floor(imageCounter / cols) * gridSize;
 
-            img.style.position = 'absolute'; // ←これが必須！！
+            img.style.position = 'absolute';
             img.style.left = `${canvas.offsetLeft + x}px`;
             img.style.top = `${canvas.offsetTop + y}px`;
 
             canvasWrapper.appendChild(img);
             imageCounter++;
 
-            // jQuery UI でドラッグ可能に
+            obstacles.push(img); // 配列に障害物を追加
+
             $(img).draggable({
                 containment: '#canvas_wrapper'
             });
-        }
-
-        // 課題図形の表示
-        function displayCanvasImage(imgnum) {
-            // 課題図形の画像のパスを構築
-            var imagePath = `static/assets/canvas_${imgnum}.png`;
-            img = document.getElementById("overlayImage");
-            img.src = imagePath;
-            img.width = maincanvas.width;
-            img.height = maincanvas.height;
         }
 
         //////////////////
@@ -348,7 +334,15 @@
         function clearbtn() {
             mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
         }
-
+        function getObstacleBounds(obstacle) {
+            const rect = obstacle.getBoundingClientRect();
+            return {
+                left: rect.left,
+                right: rect.right,
+                top: rect.top,
+                bottom: rect.bottom
+            };
+        }
         //////////////////
         ///// 前進 //////
         //////////////////
@@ -361,12 +355,29 @@
                         const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
                         const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
 
+                        // 画面端との衝突判定
                         if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) {
-                            console.log("カメが端に到達：fd中断フラグON");
-                            abortFlag = true;
                             resolve();
                             return;
                         }
+
+                        // 障害物との衝突判定
+                        const screenX = rect.left + window.pageXOffset + nextX;
+                        const screenY = rect.top + window.pageYOffset + nextY;
+
+                        for (const obstacle of obstacles) {
+                            const bounds = getObstacleBounds(obstacle);
+                            if (
+                                screenX >= bounds.left &&
+                                screenX <= bounds.right &&
+                                screenY >= bounds.top &&
+                                screenY <= bounds.bottom
+                            ) {
+                                resolve(); // 衝突した
+                                return;
+                            }
+                        }
+
 
                         mainCtx.beginPath();
                         mainCtx.lineWidth = 10;
@@ -418,6 +429,22 @@
             abortFlag = false;
             turtle.style.transform = `rotate(${a}deg)`;
 
+            const end_if_index = code_array.findIndex(row => row[0] === "if2");
+            const start_if_index = code_array.findIndex(row => row[0] === "if1");
+
+            // if1 が存在する場合のみチェック
+            if (start_if_index !== -1) {
+                if (end_if_index !== -1) {
+                    if (end_if_index < start_if_index) {
+                        alert("順番がおかしい");
+                        return; // 不正な順番なら処理終了
+                    }
+                } else {
+                    alert("IFの終端が必要");
+                    return; // IF2がない場合も処理終了
+                }
+            }
+            // 全体ループ処理（if2の順番が正しい場合のみ実行）
             for (var i = 0; i < totalBlocks; i++) {
                 i = await processCode(i);
                 if (abortFlag) {
@@ -428,7 +455,6 @@
             const event = new CustomEvent('paintdone');
             document.dispatchEvent(event);
         }
-
 
         async function processCode(index) {
             console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`); // デバッグメッセージ
@@ -453,45 +479,62 @@
                             break;
                         }
 
-                        // j回繰り返す（回数は code_array[start_for][1] から取る）
-                        const inputEl = code_array[start_for][1].querySelector("input");
-                        const repeatCount = parseFloat(inputEl.value);
+                        const inputvalue = code_array[start_for][1].querySelector("input");
+                        const repeatCount = parseFloat(inputvalue.value);
 
                         for (let j = 1; j <= repeatCount; j++) {
                             for (let k = start_for + 1; k < end_for_index; k++) {
-                                await processCode(k);
+                                k = await processCode(k);
                             }
                         }
-                        return end_for_index; // for2の次にジャンプ
+                        return end_for_index; // for2の次のインデックスにジャンプ
                     } else {
                         alert("繰り返しの終端が必要");
                     }
                     break;
                 case "if1":
-                    const end_if_index = code_array.findIndex(row => row[0] === "if2");
-                    if (end_if_index !== -1) {
-                        const start_if = index;
+                    const end_if_index = code_array.findIndex((row, i) => row[0] === "if2" && i > index);
+                    const start_if = index;
 
-                        if (end_if_index < start_if) {
-                            alert("順番がおかしい");
+                    const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+                    const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+
+                    const screenX = rect.left + window.pageXOffset + nextX;
+                    const screenY = rect.top + window.pageYOffset + nextY;
+
+                    // 衝突フラグ（端 or 障害物）
+                    let hit = false;
+
+                    // 端との衝突
+                    if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) {
+                        hit = true;
+                        console.log("カメがキャンバスの端に到達しました");
+                    }
+
+                    // 障害物との衝突
+                    for (const obstacle of obstacles) {
+                        const bounds = getObstacleBounds(obstacle);
+                        if (
+                            screenX >= bounds.left &&
+                            screenX <= bounds.right &&
+                            screenY >= bounds.top &&
+                            screenY <= bounds.bottom
+                        ) {
+                            hit = true;
+                            console.log("カメが障害物にぶつかりました");
                             break;
                         }
-
-                        // この境界チェックはあくまで「条件判定」のため → abortFlag いじらない
-                        const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
-                        const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
-                        if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) {
-                            console.log("if条件が成立（カメが端にいる）");
-
-                            for (let k = start_if + 1; k < end_if_index; k++) {
-                                k = await processCode(k);
-                                if (abortFlag) break;
-                            }
-                        }
-                        return end_if_index;
-                    } else {
-                        alert("IFの終端が必要");
                     }
+
+                    // 衝突していたら if ブロック実行
+                    if (hit) {
+                        for (let k = start_if + 1; k < end_if_index; k++) {
+                            k = await processCode(k);
+                        }
+                    }
+
+                    return end_if_index;
+
                     break;
                 case 11:
                     break; // 終端

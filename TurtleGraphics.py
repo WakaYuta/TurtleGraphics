@@ -39,18 +39,36 @@ def turtle_graphics():
     )
 
     blocks_html = ""
+    generate_html = ""
     block_id = 1
     number_id = 1
 
+    if stage == "4":
+        generate_html += f'''
+            <img src="static/assets/Obstacle.png" id="blockGenerateButton" class="btn_generate" onclick="block_Generate()">
+        '''
     # block1 を生成
     for i in range(block1_count):
-        blocks_html += f'''
-            <div class="block" id="block{block_id}" data-type="fd">
-                <p class="center"><input type="number" id = "number{number_id}" class="block_numbox" min="0" max="999" />歩進む<br /></p>
-            </div>
-        '''
+        if stage == "4":
+            # ステージ4ではナンバーボックスなし
+            blocks_html += f'''
+                <div class="block" id="block{block_id}" data-type="fd">
+                    <p class="center">
+                        <input type="number" id="number{number_id}" class="block_numbox" value="999" min="0" max="999"  />歩進む<br />
+                    </p>
+                </div>
+            '''
+        else:
+            # 通常ステージではナンバーボックスあり
+            blocks_html += f'''
+                <div class="block" id="block{block_id}" data-type="fd">
+                    <p class="center"><input type="number" id="number{number_id}" class="block_numbox" min="0" max="999" />歩進む<br /></p>
+                </div>
+            '''
+            number_id += 1
+
         block_id += 1
-        number_id += 1
+
 
     # block2 を生成
     for i in range(block2_count):
@@ -116,6 +134,7 @@ def turtle_graphics():
     return render_template(
         'TurtleGraphics.html',
         blocks_html=blocks_html,
+        generate_html=generate_html,
         total_blocks=total_blocks,  # ブロックの総数を追加
         title=stage_info.get("title", "課題"),
         image=stage_info.get("image", "canvas_default.png")

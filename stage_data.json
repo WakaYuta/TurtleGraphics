@@ -27,7 +27,7 @@
   },
   "3": {
     "title": "三角形を繰り返しで描こう",
-    "image": "canvas_3.png",
+    "image": "canvas_2.png",
     "blocks": {
       "block1": 1,
       "block2": 1,
@@ -36,6 +36,19 @@
       "block5": 1,
       "block6": 0,
       "block7": 0
+    }
+  },
+  "4": {
+    "title": "三角形を分岐で描こう",
+    "image": "canvas_2.png",
+    "blocks": {
+      "block1": 1,
+      "block2": 1,
+      "block3": 0,
+      "block4": 1,
+      "block5": 1,
+      "block6": 1,
+      "block7": 1
     }
   }
 }
