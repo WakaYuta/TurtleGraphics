@@ -39,7 +39,8 @@
     },
     {
         "element": "#block1",
-        "intro": "この「歩進む」ブロックを、中央のプログラムエリアにドラッグしてください。"
+        "intro": "<p>この「歩進む」ブロックを、中央のプログラムエリアにドラッグしてください。</p><img src='/static/assets/c1_gif.gif' style='width: 150px; display: block; margin: 8px auto;'>"
+
     },
     {
         "element": "#number1",

@@ -605,8 +605,13 @@
         function next_stage() {
             const urlParams = new URLSearchParams(window.location.search);
             const currentStage = parseInt(urlParams.get("stage") || "1");
-            const nextStage = currentStage + 1;
-            window.location.href = `/TurtleGraphics?stage=${nextStage}`;
+            if(currentStage == "4"){
+                window.location.href = '/';
+            }
+            else{
+                const nextStage = currentStage + 1;
+                window.location.href = `/TurtleGraphics?stage=${nextStage}`;
+            }   
         }
 
         function return_menu() {
