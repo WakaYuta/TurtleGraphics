@@ -1,60 +1,62 @@
 <!DOCTYPE html>
 <html lang="ja">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>タートルグラフィックスでプログラミング学習</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
 
-        .container {
-            text-align: center;
-        }
+      .container {
+        text-align: center;
+      }
 
-        button {
-            padding: 10px 20px;
-            margin-top: 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+      button {
+        padding: 10px 20px;
+        margin-top: 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="container">
-        <h1>タートルグラフィックスでプログラミング学習</h1>
-        <h2>操作方法</h2>
-        <p>ブロックを使ってプログラミングしてカメを操作してください。</p>
-        <button id="startButton">スタート</button>
-        <h2>ステージ選択</h2>
-        <select id="stageSelect">
-            <option value="1">ステージ1</option>
-            <option value="2">ステージ2</option>
-            <option value="3">ステージ3</option>
-            <option value="4">ステージ4</option>
-        </select>
+      <h1>タートルグラフィックスでプログラミング学習</h1>
+      <h2>操作方法</h2>
+      <p>ブロックを使ってプログラミングしてカメを操作してください。</p>
+      <button id="startButton">スタート</button>
+      <h2>ステージ選択</h2>
+      <select id="stageSelect">
+        <option value="1">ステージ1</option>
+        <option value="2">ステージ2</option>
+        <option value="3">ステージ3</option>
+        <option value="4">ステージ4</option>
+      </select>
     </div>
     <script>
-        document.getElementById('startButton').addEventListener('click', function () {
-            const stage = document.getElementById('stageSelect').value;
-            window.location.href = `TurtleGraphics?stage=${stage}`;
+      document
+        .getElementById("startButton")
+        .addEventListener("click", function () {
+          const stage = document.getElementById("stageSelect").value;
+          window.location.href = `TurtleGraphics?stage=${stage}`;
         });
 
-        document.getElementById('stageSelect').addEventListener('change', function () {
-            const stage = this.value;
-            window.app.setStage(stage);
+      document
+        .getElementById("stageSelect")
+        .addEventListener("change", function () {
+          const stage = this.value;
+          window.app.setStage(stage);
         });
     </script>
-</body>
-
+  </body>
 </html>
