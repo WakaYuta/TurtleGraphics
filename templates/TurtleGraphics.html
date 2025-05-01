@@ -16,9 +16,7 @@
                 <div id="taskname">{{ title }}</div>
                 <div id="canvas_wrapper">
                     <div id="answer-mark" class="mark-icon">〇</div>
-                    <div data-step='1' data-intro='Help Text First!!'>
-                        <canvas id="mainCanvas" width="700" height="700"></canvas>
-                    </div>
+                    <canvas id="mainCanvas" width="700" height="700"></canvas>
                     <canvas id="gridCanvas" width="700" height="700"></canvas>
                     <img id="overlayImage" src="static/assets/{{ image }}" />
                 </div>
@@ -605,13 +603,13 @@
         function next_stage() {
             const urlParams = new URLSearchParams(window.location.search);
             const currentStage = parseInt(urlParams.get("stage") || "1");
-            if(currentStage == "4"){
+            if (currentStage == "4") {
                 window.location.href = '/';
             }
-            else{
+            else {
                 const nextStage = currentStage + 1;
                 window.location.href = `/TurtleGraphics?stage=${nextStage}`;
-            }   
+            }
         }
 
         function return_menu() {

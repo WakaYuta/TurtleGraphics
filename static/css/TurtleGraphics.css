@@ -112,7 +112,7 @@ body {
     cursor: pointer;
 }
 
-.btn_generate{
+.btn_generate {
     cursor: pointer;
     width: 50px;
     height: 50px;
@@ -248,7 +248,7 @@ input[type=number]::-webkit-outer-spin-button {
     font-size: 30px;
     background-color: #e3fffa;
     font-family: "Kosugi", sans-serif;
-    /* visibility: hidden; */
+    visibility: hidden;
 }
 
 .btn_menu {
