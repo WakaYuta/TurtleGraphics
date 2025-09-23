@@ -170,9 +170,13 @@
           document.getElementById('block_area').innerHTML = blocks_html;
           document.getElementById('generate_button_container').innerHTML = generate_html;
 
+          const blockArea = document.getElementById('block_area');
+          const initialHeight = blockArea.offsetHeight; // 最初の高さを記憶
+          blockArea.style.height = `${initialHeight}px`; // 高さを固定する
+
           $(".block").draggable({
             start: function () { $(this).addClass("block_drag").removeClass("block_snap"); },
-            stop: function () { $(this).removeClass("block_drag"); create_array(); },
+            stop: function () { $(this).removeClass("block_drag"); },
           });
         })
         .catch(error => console.error('Error:', error));
@@ -255,49 +259,77 @@
     //ドラッグ処理開始//
     //////////////////
     $(function () {
-      var now_object = null;
+      $('body').on('mousedown', '.block', function () {
+        $(this).draggable({
+          start: function (event, ui) {
+            $(this).addClass("block_drag");
+            $(this).data('dropped_successfully', false);
+          },
+          stop: function (event, ui) {
+            $(this).removeClass("block_drag");
+            if (!$(this).data('dropped_successfully')) {
+              $(this).appendTo('#block_area').removeClass('block_snap').css({ top: 0, left: 0 });
+            }
+            create_array();
+          }
+        });
+      });
+
+      // code_areaの中にある、スナップエリア（溝）を、ブロックを置ける場所にします
       $(".blocksnap_area").droppable({
+        accept: ".block",
         hoverClass: "block_hover",
-        //ドロップした時
         drop: function (event, ui) {
-          now_object = ui.draggable;
-          now_object.offset({ top: $(this).offset().top, left: $(this).offset().left - 3, });
-          now_object.addClass("block_snap");
-        },
+          const droppedBlock = ui.draggable;
+
+          // ドロップされたブロックに、「ちゃんと置かれたよ」という印をつけます
+          droppedBlock.data('dropped_successfully', true);
+
+          // この溝にすでにあるブロックを、元のブロック置き場に戻します
+          $(this).children('.block').appendTo('#block_area').removeClass('block_snap').css({ top: 0, left: 0 });
+
+          // 新しいブロックをこの溝に配置します
+          droppedBlock.appendTo(this).addClass("block_snap").css({ top: 0, left: 0 });
+        }
+      });
+
+      // 元のブロック置き場も、ブロックを置ける場所に戻します
+      $("#block_area").droppable({
+        accept: ".block",
+        drop: function (event, ui) {
+          // ドロップされたブロックに、「ちゃんと置かれたよ」という印をつけます
+          ui.draggable.data('dropped_successfully', true);
+          ui.draggable.appendTo(this).removeClass("block_snap").css({ top: 0, left: 0 });
+        }
       });
     });
 
     //////////////////
     // 配列を作る ////
     //////////////////
-    var code_array = Array(codeAreaSize).fill(0).map(() => Array(2).fill(0));
     function create_array() {
-      // 各コードエリアとブロックの位置を取得
-      const codearea_top = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().top);
-      const codearea_left = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().left);
-      let array_flag = 0;
-      // 上のエリアから順に何のブロックがドロップされているか検知
-      for (let i = 0; i < codeAreaSize; i++) {
-        array_flag = 0;
-        for (let j = 0; j < totalBlocks; j++) {
-          const block = $(`#block${j + 1}`);
-          if (block.length === 0) continue;
-          const block_top = block.offset().top;
-          const block_left = block.offset().left;
-          if (codearea_top[i] === block_top && codearea_left[i] === block_left + 3) {
-            const element = document.getElementById(`block${j + 1}`);
-            code_array[i][0] = element.dataset.type;
-            code_array[i][1] = element;
-            array_flag = 1;
-            break; // マッチしたら内側のループを抜ける
-          }
+      // 配列を一度リセットします
+      code_array = Array(codeAreaSize).fill(0).map(() => Array(2).fill(0));
+
+      // 9つのコードエリア（溝）を一つずつ順番に見ていきます
+      $('#code_area .blocksnap_area').each(function (index) {
+
+        // ★★★ 修正点2: 座標ではなく、「この溝の中に、ブロックはいる？」と、HTMLの親子関係で探します ★★★
+        const blockElement = $(this).find('.block').get(0);
+
+        // もしブロックが見つかったら…
+        if (blockElement) {
+          // 配列の正しい位置に、ブロックの種類と情報を保存します
+          code_array[index][0] = blockElement.dataset.type;
+          code_array[index][1] = blockElement;
         }
-        // ブロックを検知できなかった時、0を入れる
-        if (array_flag === 0) { code_array[i][0] = 0; }
-      }
+        // もし見つからなければ、配列の中身は初期値 [0, 0] のままです
+      });
+
       console.log("配列=", code_array);
       document.dispatchEvent(new CustomEvent("codeArrayChanged"));
     }
+
 
     let flag = true;
     function grid() {

@@ -1,50 +1,67 @@
 @import url("https://fonts.googleapis.com/css?family=Kosugi");
 
+/* 全体の基本設定 */
 * {
   box-sizing: border-box;
 }
 
 html,
 body {
-  /*background-image: url("assets/background.jpg");*/
-  background-size: cover;
   margin: 0;
   padding: 0;
-  font-family: Kosugi, sans-serif;
+  font-family: "Kosugi", sans-serif;
+  /* 全体に新しいフォントを適用 */
   user-select: none;
-  /*background-color: #cecece;*/
+  background-color: #f0f4f8;
+  /* 背景色 */
+  color: #333;
 }
 
 #turtle {
   transform-origin: 50% 100%;
 }
 
+/* --- 全体のレイアウト --- */
 #main {
   display: flex;
+  flex-wrap: wrap;
+  /* 画面が狭くなったら折り返す */
+  padding: 20px;
+  gap: 20px;
+  /* 各エリアの間に隙間を作る */
+  justify-content: center;
+  align-items: flex-start;
 }
 
+/* --- キャンバスエリア --- */
 #canvas_area {
-  width: auto;
-  height: auto;
-  margin: 1px auto;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
 }
 
 #taskname {
-  text-align: center;
-  cursor: pointer;
-  font-size: 40px;
-  background-color: #e3fffa;
-  font-family: "Kosugi", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a3a53;
+  /* ネイビー系の濃い色で見やすく */
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 12px 12px 0 0;
+  border: 1px solid #d8e2eb;
+  border-bottom: none;
 }
 
 #canvas_wrapper {
   position: relative;
   width: 720px;
   height: 720px;
-  background-color: rgb(128, 128, 128);
-  padding: 10px;
-  margin: 20px;
+  background-color: #ffffff;
+  border: 1px solid #d8e2eb;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* 影をつけて立体的に */
+  border-radius: 0 0 12px 12px;
+  margin: 0;
+  padding: 0;
 }
 
 .mark-icon {
@@ -59,28 +76,30 @@ body {
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
-  z-index: 1000;
+  z-index: 3;
 }
 
 #mainCanvas {
   display: block;
   inset: 0;
   z-index: 2;
+  top: 0;
+  left: 0;
 }
 
 #gridCanvas {
   position: absolute;
   display: block;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
   pointer-events: none;
   z-index: 1;
 }
 
 #overlayImage {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
   opacity: 0.3;
   pointer-events: none;
 }
@@ -88,6 +107,13 @@ body {
 #field {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #d8e2eb;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  margin-top: -1px;
 }
 
 .color-picker-container {
@@ -112,71 +138,88 @@ body {
   cursor: pointer;
 }
 
-.btn_generate {
-  cursor: pointer;
-  width: 50px;
-  height: 50px;
-  margin: auto;
-}
-
+/* ボタン共通スタイル */
 .btn {
-  width: 225px;
-  height: 75px;
-  margin: 20px 24.5px;
-  border-radius: 15px;
+  padding: 14px 20px;
+  margin: 0;
+  border-radius: 8px;
   text-align: center;
   cursor: pointer;
-  font-size: 40px;
-  background-color: #e3fffa;
-  font-family: "Kosugi", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  transition: all 0.2s ease;
 }
 
-.btn:hover {
-  background: #ecfffc;
+.btn_start {
+  flex: 1;
+  background-color: #28a745;
+  color: white;
+  height: 60px;
 }
 
-/* .btn_check {
-    
-} */
+.btn_start:hover {
+  background-color: #218838;
+}
 
+.btn_check {
+  background-color: #007bff;
+  color: white;
+  width: 200px;
+}
+
+.btn_check:hover {
+  background-color: #0069d9;
+}
+
+
+/* --- センターエリア --- */
 #center_area {
-  width: auto;
-  height: auto;
-  margin: 1px auto;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  gap: 20px;
 }
+
+#center_area>div:first-child {
+  display: flex;
+  gap: 10px;
+}
+
+/* コードエリア */
 
 #code_area {
-  width: 231px;
+  width: 100%;
   height: 726px;
-  margin: 20px auto;
-  border-width: 3px;
-  border-style: dashed;
-}
-
-#code_area1 {
-  border-top: none;
-}
-
-#code_area9 {
-  border-bottom: none;
+  margin: 0;
+  border: 2px dashed #a9c2d7;
+  border-radius: 12px;
+  background-color: #f8f9fa;
+  padding: 10px 0;
 }
 
 .blocksnap_area {
   width: 225px;
   height: 80px;
-  border-top: 3px dashed;
-  background: #ffffff;
-  margin: 0px auto;
+  border-top: 2px dashed #d8e2eb;
+  margin: 0 auto;
 }
 
-/* .btn_start {
+#code_area>.blocksnap_area:first-child {
+  border-top: none;
+  padding-top: 2px;
+}
 
-} */
+/* --- ブロックエリア --- */
 #block_area {
   width: 300px;
   height: auto;
-  margin: 10px auto;
+  max-height: 800px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #d8e2eb;
 }
 
 .block {
@@ -189,17 +232,38 @@ body {
   background: rgb(214, 255, 248);
   border-style: solid;
   border-radius: 15px;
-  border-width: 3px;
+  border-width: 1px;
   display: block;
   font-size: large;
   display: grid;
   place-items: center;
 }
 
-.center {
-  margin: 0px;
-  padding: 0px;
-  /* text-align: center; */
+.block:active,
+.block_drag {
+  background: #b2ebf2;
+  border-bottom-width: 1px;
+  transform: translateY(2px);
+}
+
+.block_hover {
+  background: #f0f4f8;
+}
+
+.block_snap {
+  background: #d4edda;
+  border-color: #155724;
+  margin: 0;
+}
+
+.block_numbox {
+  width: 50px;
+  height: 40px;
+  margin: 0 5px;
+  font-size: 18px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -207,60 +271,34 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
 }
 
-.block_numbox {
-  width: 50px;
-  height: 50px;
-  margin: 0;
-  font-size: 25px;
-}
-
-.block_drag {
-  background: rgb(231, 252, 248);
-}
-
-.block_hover {
-  background: rgb(233, 233, 233);
-}
-
-.block_snap {
-  background: rgb(180, 255, 243);
-}
-
+/* --- 4. その他エリア --- */
 #others_area {
-  width: 100px;
-  height: auto;
-  margin: 20px auto;
+  width: 280px;
 }
 
-.btn_help {
-  border-radius: 1000px;
-  width: 90px;
-  height: 90px;
-  margin: 10px auto;
+.btn_menu,
+.btn_next {
+  width: calc(50% - 5px);
+  display: inline-block;
+  margin: 0;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn_menu:hover,
+.btn_next:hover {
+  background-color: #e2e6ea;
 }
 
 .btn_next {
-  border-radius: 1000px;
-  width: 90px;
-  height: 90px;
-  margin: 10px auto;
-  cursor: pointer;
-  font-size: 30px;
-  background-color: #e3fffa;
-  font-family: "Kosugi", sans-serif;
   visibility: hidden;
+  float: right;
 }
 
-.btn_menu {
-  border-radius: 1000px;
-  width: 90px;
-  height: 90px;
-  margin: 10px auto;
-  cursor: pointer;
-  font-size: 30px;
-  background-color: #e3fffa;
-  font-family: "Kosugi", sans-serif;
-}
-
-@media screen and (max-width: 1000px) {
+.center {
+  margin: 0;
 }
