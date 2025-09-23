@@ -1,7 +1,7 @@
 [
     {
-        "element": "#page",
-        "intro": "次は「繰り返し」を使って、三角形を描いてみましょう！"
+        "intro": "次は「繰り返し」を使って、三角形を描いてみましょう！",
+        "position": "floating"
     },
     {
         "element": "#block3",
@@ -12,19 +12,15 @@
         "intro": "こちらも新しいブロックです。"
     },
     {
-        "element": "#page",
-        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
+        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。,</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>",
+        "position": "floating"
     },
     {
-        "element": "#page",
-        "intro": "それでは、ブロックを組み立てて三角形を描いてみましょう！"
-    },
-    {
-        "element": "#page",
-        "intro": "OK!繰り返しの使い方がわかりましたか？"
+        "intro": "それでは、ブロックを組み立てて三角形を描いてみましょう！",
+        "position": "floating"
     },
     {
         "element": "#btn_next",
-        "intro": "「NEXT」をクリックして、つぎのステージに進みましょう！"
+        "intro": "OK!繰り返しの使い方がわかりましたか？<br>「NEXT」をクリックして、つぎのステージに進みましょう！"
     }
 ]

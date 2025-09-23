@@ -275,29 +275,23 @@
         });
       });
 
-      // code_areaの中にある、スナップエリア（溝）を、ブロックを置ける場所にします
       $(".blocksnap_area").droppable({
         accept: ".block",
         hoverClass: "block_hover",
         drop: function (event, ui) {
           const droppedBlock = ui.draggable;
 
-          // ドロップされたブロックに、「ちゃんと置かれたよ」という印をつけます
           droppedBlock.data('dropped_successfully', true);
 
-          // この溝にすでにあるブロックを、元のブロック置き場に戻します
           $(this).children('.block').appendTo('#block_area').removeClass('block_snap').css({ top: 0, left: 0 });
 
-          // 新しいブロックをこの溝に配置します
           droppedBlock.appendTo(this).addClass("block_snap").css({ top: 0, left: 0 });
         }
       });
 
-      // 元のブロック置き場も、ブロックを置ける場所に戻します
       $("#block_area").droppable({
         accept: ".block",
         drop: function (event, ui) {
-          // ドロップされたブロックに、「ちゃんと置かれたよ」という印をつけます
           ui.draggable.data('dropped_successfully', true);
           ui.draggable.appendTo(this).removeClass("block_snap").css({ top: 0, left: 0 });
         }
@@ -308,22 +302,17 @@
     // 配列を作る ////
     //////////////////
     function create_array() {
-      // 配列を一度リセットします
+      // 配列を一度リセット
       code_array = Array(codeAreaSize).fill(0).map(() => Array(2).fill(0));
 
-      // 9つのコードエリア（溝）を一つずつ順番に見ていきます
       $('#code_area .blocksnap_area').each(function (index) {
 
-        // ★★★ 修正点2: 座標ではなく、「この溝の中に、ブロックはいる？」と、HTMLの親子関係で探します ★★★
         const blockElement = $(this).find('.block').get(0);
 
-        // もしブロックが見つかったら…
         if (blockElement) {
-          // 配列の正しい位置に、ブロックの種類と情報を保存します
           code_array[index][0] = blockElement.dataset.type;
           code_array[index][1] = blockElement;
         }
-        // もし見つからなければ、配列の中身は初期値 [0, 0] のままです
       });
 
       console.log("配列=", code_array);
@@ -706,7 +695,7 @@
           document.addEventListener('trianglecorrect', function checktrianglecorrect() {
             trianglecorrect1 = true;
             document.removeEventListener('trianglecorrect', checktrianglecorrect);
-            intro.goToStep(6).start();
+            intro.goToStep(6);
           }, { once: true });
         }
       }
@@ -717,7 +706,7 @@
           document.addEventListener('trianglecorrect', function checktrianglecorrect() {
             trianglecorrect2 = true;
             document.removeEventListener('trianglecorrect', checktrianglecorrect);
-            intro.goToStep(6).start();
+            intro.goToStep(6);
           }, { once: true });
         }
       }

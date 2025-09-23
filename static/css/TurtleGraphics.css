@@ -10,10 +10,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Kosugi", sans-serif;
-  /* 全体に新しいフォントを適用 */
   user-select: none;
   background-color: #f0f4f8;
-  /* 背景色 */
   color: #333;
 }
 
@@ -25,10 +23,8 @@ body {
 #main {
   display: flex;
   flex-wrap: wrap;
-  /* 画面が狭くなったら折り返す */
   padding: 20px;
   gap: 20px;
-  /* 各エリアの間に隙間を作る */
   justify-content: center;
   align-items: flex-start;
 }
@@ -43,7 +39,6 @@ body {
   font-size: 28px;
   font-weight: 700;
   color: #1a3a53;
-  /* ネイビー系の濃い色で見やすく */
   background-color: #ffffff;
   padding: 15px;
   border-radius: 12px 12px 0 0;
@@ -58,7 +53,6 @@ body {
   background-color: #ffffff;
   border: 1px solid #d8e2eb;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  /* 影をつけて立体的に */
   border-radius: 0 0 12px 12px;
   margin: 0;
   padding: 0;
@@ -271,7 +265,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
 }
 
-/* --- 4. その他エリア --- */
+/* --- その他エリア --- */
 #others_area {
   width: 280px;
 }
@@ -298,6 +292,9 @@ input[type="number"]::-webkit-outer-spin-button {
   visibility: hidden;
   float: right;
 }
+
+
+
 
 .center {
   margin: 0;
