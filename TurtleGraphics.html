@@ -1,710 +1,718 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Turtle Graphics</title>
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css"
-    />
-    <link rel="stylesheet" href="static/css/TurtleGraphics.css" />
-    <link rel="stylesheet" href="static/css/introjs.min.css" />
-  </head>
 
-  <body>
-    <div id="page" style="width: 100%; height: 100%">
-      <div id="main">
-        <div id="canvas_area">
-          <div id="taskname"></div>
-          <div id="canvas_wrapper">
-            <div id="answer-mark" class="mark-icon">〇</div>
-            <canvas id="mainCanvas" width="700" height="700"></canvas>
-            <canvas id="gridCanvas" width="700" height="700"></canvas>
-            <img id="overlayImage" src="" />
+<head>
+  <meta charset="UTF-8" />
+  <title>Turtle Graphics</title>
+  <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/cupertino/jquery-ui.min.css" />
+  <link rel="stylesheet" href="static/css/TurtleGraphics.css" />
+  <link rel="stylesheet" href="static/css/introjs.min.css" />
+</head>
+
+<body>
+  <div id="page" style="width: 100%; height: 100%">
+    <div id="main">
+      <div id="canvas_area">
+        <div id="taskname"></div>
+        <div id="canvas_wrapper">
+          <div id="answer-mark" class="mark-icon">〇</div>
+          <canvas id="mainCanvas" width="700" height="700"></canvas>
+          <canvas id="gridCanvas" width="700" height="700"></canvas>
+          <img id="overlayImage" src="" />
+        </div>
+        <div id="field">
+          <div class="color-picker-container">
+            <label class="color-picker-label" for="colorPicker">Color Picker:</label>
+            <input class="color-picker" type="color" id="colorPicker" value="#000000" />
           </div>
-          <div id="field">
-            <div class="color-picker-container">
-              <label class="color-picker-label" for="colorPicker">Color Picker:</label>
-              <input class="color-picker" type="color" id="colorPicker" value="#000000" />
-            </div>
-            <div id="generate_button_container"></div>
-            <button class="btn" type="button" id="gridButton" onclick="grid()">
-              GridONOFF
-            </button>
-            <button
-              id="btn_check"
-              class="btn btn_check"
-              type="button"
-              onclick="check()"
-            >
-              CHECK
-            </button>
-          </div>
+          <div id="generate_button_container"></div>
+          <button class="btn" type="button" id="gridButton" onclick="grid()">
+            GridONOFF
+          </button>
+          <button id="btn_check" class="btn btn_check" type="button" onclick="check()">
+            CHECK
+          </button>
+        </div>
+      </div>
+
+      <div id="center_area">
+        <div>
+          <button id="btn_start" class="btn btn_start" type="button" onclick="start()">
+            START
+          </button>
+          <button class="btn btn_start" type="button" onclick="clearbtn()">
+            CLEAR
+          </button>
         </div>
 
-        <div id="center_area">
-          <div>
-            <button
-              id="btn_start"
-              class="btn btn_start"
-              type="button"
-              onclick="start()"
-            >
-              START
-            </button>
-            <button class="btn btn_start" type="button" onclick="clearbtn()">
-              CLEAR
-            </button>
-          </div>
-
-          <div id="code_area">
-            <div id="code_area1" class="blocksnap_area"></div>
-            <div id="code_area2" class="blocksnap_area"></div>
-            <div id="code_area3" class="blocksnap_area"></div>
-            <div id="code_area4" class="blocksnap_area"></div>
-            <div id="code_area5" class="blocksnap_area"></div>
-            <div id="code_area6" class="blocksnap_area"></div>
-            <div id="code_area7" class="blocksnap_area"></div>
-            <div id="code_area8" class="blocksnap_area"></div>
-            <div id="code_area9" class="blocksnap_area"></div>
-          </div>
+        <div id="code_area">
+          <div id="code_area1" class="blocksnap_area"></div>
+          <div id="code_area2" class="blocksnap_area"></div>
+          <div id="code_area3" class="blocksnap_area"></div>
+          <div id="code_area4" class="blocksnap_area"></div>
+          <div id="code_area5" class="blocksnap_area"></div>
+          <div id="code_area6" class="blocksnap_area"></div>
+          <div id="code_area7" class="blocksnap_area"></div>
+          <div id="code_area8" class="blocksnap_area"></div>
+          <div id="code_area9" class="blocksnap_area"></div>
         </div>
+      </div>
 
-        <div id="block_area"></div>
-        <div id="others_area">
-          <div id="help">
-            <button
-              id="btn_menu"
-              class="btn_menu"
-              type="button"
-              onclick="return_menu()"
-            >
-              menu
-            </button>
-            <button
-              id="btn_next"
-              class="btn_next"
-              type="button"
-              onclick="next_stage()"
-            >
-              next
-            </button>
-          </div>
+      <div id="block_area"></div>
+      <div id="others_area">
+        <div id="help">
+          <button id="btn_menu" class="btn_menu" type="button" onclick="return_menu()">
+            menu
+          </button>
+          <button id="btn_next" class="btn_next" type="button" onclick="next_stage()">
+            next
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <img
-      src="static/assets/turtle.png"
-      id="turtle"
-      style="position: absolute; top: 450px; left: 450px"
-    />
-    <script src="static/js/intro.min.js"></script>
-    <script
-      type="text/javascript"
-      src="http://code.jquery.com/jquery-1.10.2.min.js"
-    ></script>
-    <script
-      type="text/javascript"
-      src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"
-    ></script>
-    <script type="text/javascript">
-      var startx = 350; //初期位置
-      var starty = 350; //初期位置
-      let currentX = startx;
-      let currentY = starty;
-      var x = (y = a = 0);
-      let turtle_speed = 1;
-      const codeAreaSize = 9;
-      let totalBlocks = 0;
+  <img src="static/assets/turtle.png" id="turtle" style="position: absolute; top: 450px; left: 450px" />
+  <script src="static/js/intro.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+  <script type="text/javascript">
+    var startx = 350; //初期位置
+    var starty = 350; //初期位置
+    let currentX = startx;
+    let currentY = starty;
+    var x = (y = a = 0);
+    let turtle_speed = 1;
+    const codeAreaSize = 9;
+    let totalBlocks = 0;
 
-      const maincanvas = document.querySelector("#mainCanvas");
-      const gridcanvas = document.querySelector("#gridCanvas");
-      const mainCtx = maincanvas.getContext("2d", { willReadFrequently: true });
-      const gridCtx = gridcanvas.getContext("2d");
-      const colorPicker = document.getElementById("colorPicker");
-      let lineColor = "rgb(0, 0, 0)";
+    const maincanvas = document.querySelector("#mainCanvas");
+    const gridcanvas = document.querySelector("#gridCanvas");
+    const mainCtx = maincanvas.getContext("2d", { willReadFrequently: true });
+    const gridCtx = gridcanvas.getContext("2d");
+    const colorPicker = document.getElementById("colorPicker");
+    let lineColor = "rgb(0, 0, 0)";
 
-      mainCtx.fillStyle = "rgb(255, 255, 255)"; // キャンバスの背景色（内側の白色） 
+    mainCtx.fillStyle = "rgb(255, 255, 255)"; // キャンバスの背景色（内側の白色） 
+    mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
+
+    window.addEventListener("DOMContentLoaded", function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const stage = urlParams.get("stage") || "1";
+
+      fetch('stage_data.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("stage_data.jsonの読み込みに失敗しました。");
+          }
+          return response.json();
+        })
+        .then(stageData => {
+          const stageInfo = stageData[stage];
+          if (!stageInfo) {
+            alert('無効なステージです。メニューに戻ります。');
+            window.location.href = 'landing.html';
+            return;
+          }
+
+          document.getElementById('taskname').textContent = stageInfo.title;
+          document.getElementById('overlayImage').src = `static/assets/${stageInfo.image}`;
+
+          let blocks_html = '';
+          let generate_html = '';
+          let block_id = 1;
+          let number_id = 1;
+
+          const blockCounts = stageInfo.blocks;
+          totalBlocks = Object.values(blockCounts).reduce((sum, count) => sum + count, 0);
+
+          if (stage === "4") {
+            generate_html += `<img src="static/assets/Obstacle.png" id="blockGenerateButton" class="btn_generate" onclick="block_Generate()">`;
+          }
+
+          for (let i = 0; i < (blockCounts.block1 || 0); i++) {
+            if (stage === "4") {
+              blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" value="999" min="0" max="999"  />歩進む<br /></p></div>`;
+            } else {
+              blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />歩進む<br /></p></div>`;
+              number_id++;
+            }
+            block_id++;
+          }
+          for (let i = 0; i < (blockCounts.block2 || 0); i++) {
+            blocks_html += `<div class="block" id="block${block_id}" data-type="rt"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />度右に曲がる<br /></p></div>`;
+            block_id++;
+            number_id++;
+          }
+          for (let i = 0; i < (blockCounts.block3 || 0); i++) {
+            blocks_html += `<div class="block" id="block${block_id}" data-type="lt"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />度左に曲がる<br /></p></div>`;
+            block_id++;
+            number_id++;
+          }
+          for (let i = 0; i < (blockCounts.block4 || 0); i++) {
+            blocks_html += `<div class="block" id="block${block_id}" data-type="for1"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />回繰り返す<br /></p></div>`;
+            block_id++;
+            number_id++;
+          }
+          for (let i = 0; i < (blockCounts.block5 || 0); i++) {
+            blocks_html += `<div class="block" id="block${block_id}" data-type="for2"><p class="center">ここまで繰りかえす<br /></p></div>`;
+            block_id++;
+          }
+          for (let i = 0; i < (blockCounts.block6 || 0); i++) {
+            blocks_html += `<div class="block" id="block${block_id}" data-type="if1"><p class="center">壁にぶつかったら<br /></p></div>`;
+            block_id++;
+          }
+          for (let i = 0; i < (blockCounts.block7 || 0); i++) {
+            blocks_html += `<div class="block" id="block${block_id}" data-type="if2"><p class="center">ここまでIF<br /></p></div>`;
+            block_id++;
+          }
+
+          document.getElementById('block_area').innerHTML = blocks_html;
+          document.getElementById('generate_button_container').innerHTML = generate_html;
+
+          $(".block").draggable({
+            start: function () { $(this).addClass("block_drag").removeClass("block_snap"); },
+            stop: function () { $(this).removeClass("block_drag"); create_array(); },
+          });
+        })
+        .catch(error => console.error('Error:', error));
+
+      fetch(`static/json/tutorials_stage${stage}.json`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("チュートリアルファイルの読み込みに失敗しました。");
+          }
+          return res.json();
+        })
+        .then((steps) => {
+          intro.setOptions({
+            showProgress: false,
+            disableInteraction: true,
+            exitOnEsc: false,
+            exitOnOverlayClick: false,
+            nextLabel: "次へ",
+            prevLabel: "戻る",
+            doneLabel: "完了",
+            steps: steps,
+          });
+          intro.start();
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    //////////////////
+    ////キャンバス/////
+    //////////////////
+    const gridSize = 100;
+    gridCtx.strokeStyle = "rgb(200, 200, 200)";
+    gridCtx.lineWidth = 1;
+    for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
+      if (i < gridcanvas.width) { gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke(); }
+      if (i < gridcanvas.height) { gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke(); }
+    }
+    mainCtx.strokeStyle = lineColor;
+    // イベントリスナーを追加して色の変更を検知する
+    colorPicker.addEventListener("input", function () { lineColor = colorPicker.value; mainCtx.strokeStyle = lineColor; });
+    maincanvas.addEventListener("click", (e) => {
+      let rect = e.target.getBoundingClientRect();
+      // ブラウザ上でのクリック位置を取得
+      const viewX = e.clientX - rect.left, viewY = e.clientY - rect.top;
+      // 表示サイズとキャンバスの実際のサイズ比率を計算
+      const scaleWidth = maincanvas.clientWidth / maincanvas.width, scaleHeight = maincanvas.clientHeight / maincanvas.height;
+      // ブラウザのクリック位置をキャンバス上の位置に変換
+      currentX = Math.floor(viewX / scaleWidth);
+      currentY = Math.floor(viewY / scaleHeight);
+      const turtle = document.getElementById("turtle");
+      // タートルの幅と高さを取得
+      const turtleWidth = turtle.offsetWidth;
+      const turtleHeight = turtle.offsetHeight;
+      // カメのしっぽの位置をクリック位置に合わせるための調整
+      turtle.style.position = "absolute";
+      turtle.style.left = `${rect.left + window.pageXOffset + currentX - turtleWidth / 2}px`;
+      turtle.style.top = `${rect.top + window.pageYOffset + currentY - turtleHeight}px`;
+    });
+    const obstacles = [];
+    let imageCounter = 0;
+    function block_Generate() {
+      const canvasWrapper = document.getElementById("canvas_wrapper");
+      const img = document.createElement("img");
+      img.src = "static/assets/Obstacle.png";
+      img.classList.add("draggable");
+      img.width = 50; img.height = 50;
+      const cols = Math.floor(maincanvas.width / 50);
+      const x = (imageCounter % cols) * 50;
+      const y = Math.floor(imageCounter / cols) * 50;
+      img.style.position = "absolute";
+      img.style.left = `${maincanvas.offsetLeft + x}px`;
+      img.style.top = `${maincanvas.offsetTop + y}px`;
+      canvasWrapper.appendChild(img);
+      imageCounter++;
+      obstacles.push(img);
+      $(img).draggable({ containment: "#canvas_wrapper" });
+    }
+
+    //////////////////
+    //ドラッグ処理開始//
+    //////////////////
+    $(function () {
+      var now_object = null;
+      $(".blocksnap_area").droppable({
+        hoverClass: "block_hover",
+        //ドロップした時
+        drop: function (event, ui) {
+          now_object = ui.draggable;
+          now_object.offset({ top: $(this).offset().top, left: $(this).offset().left - 3, });
+          now_object.addClass("block_snap");
+        },
+      });
+    });
+
+    //////////////////
+    // 配列を作る ////
+    //////////////////
+    var code_array = Array(codeAreaSize).fill(0).map(() => Array(2).fill(0));
+    function create_array() {
+      // 各コードエリアとブロックの位置を取得
+      const codearea_top = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().top);
+      const codearea_left = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().left);
+      let array_flag = 0;
+      // 上のエリアから順に何のブロックがドロップされているか検知
+      for (let i = 0; i < codeAreaSize; i++) {
+        array_flag = 0;
+        for (let j = 0; j < totalBlocks; j++) {
+          const block = $(`#block${j + 1}`);
+          if (block.length === 0) continue;
+          const block_top = block.offset().top;
+          const block_left = block.offset().left;
+          if (codearea_top[i] === block_top && codearea_left[i] === block_left + 3) {
+            const element = document.getElementById(`block${j + 1}`);
+            code_array[i][0] = element.dataset.type;
+            code_array[i][1] = element;
+            array_flag = 1;
+            break; // マッチしたら内側のループを抜ける
+          }
+        }
+        // ブロックを検知できなかった時、0を入れる
+        if (array_flag === 0) { code_array[i][0] = 0; }
+      }
+      console.log("配列=", code_array);
+      document.dispatchEvent(new CustomEvent("codeArrayChanged"));
+    }
+
+    let flag = true;
+    function grid() {
+      if (flag) { gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height); flag = false; }
+      else {
+        for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
+          if (i < gridcanvas.width) { gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke(); }
+          if (i < gridcanvas.height) { gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke(); }
+        }
+        flag = true;
+      }
+    }
+
+    //////////////////
+    ///// クリア //////
+    //////////////////
+    function clearbtn() {
+      mainCtx.fillStyle = "rgb(255, 255, 255)";
       mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
+    }
+    function getObstacleBounds(obstacle) {
+      const rect = obstacle.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+    }
 
-      window.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const stage = urlParams.get("stage") || "1";
-        
-        fetch('stage_data.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("stage_data.jsonの読み込みに失敗しました。");
-                }
-                return response.json();
-            })
-            .then(stageData => {
-                const stageInfo = stageData[stage];
-                if (!stageInfo) {
-                    alert('無効なステージです。メニューに戻ります。');
-                    window.location.href = 'landing.html';
-                    return;
-                }
-                
-                document.getElementById('taskname').textContent = stageInfo.title;
-                document.getElementById('overlayImage').src = `static/assets/${stageInfo.image}`;
-
-                let blocks_html = '';
-                let generate_html = '';
-                let block_id = 1;
-                let number_id = 1;
-
-                const blockCounts = stageInfo.blocks;
-                totalBlocks = Object.values(blockCounts).reduce((sum, count) => sum + count, 0);
-                
-                if (stage === "4") {
-                    generate_html += `<img src="static/assets/Obstacle.png" id="blockGenerateButton" class="btn_generate" onclick="block_Generate()">`;
-                }
-
-                for (let i = 0; i < (blockCounts.block1 || 0); i++) {
-                    if (stage === "4") {
-                        blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" value="999" min="0" max="999"  />歩進む<br /></p></div>`;
-                    } else {
-                        blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />歩進む<br /></p></div>`;
-                        number_id++;
-                    }
-                    block_id++;
-                }
-                for (let i = 0; i < (blockCounts.block2 || 0); i++) {
-                    blocks_html += `<div class="block" id="block${block_id}" data-type="rt"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />度右に曲がる<br /></p></div>`;
-                    block_id++;
-                    number_id++;
-                }
-                for (let i = 0; i < (blockCounts.block3 || 0); i++) {
-                    blocks_html += `<div class="block" id="block${block_id}" data-type="lt"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />度左に曲がる<br /></p></div>`;
-                    block_id++;
-                    number_id++;
-                }
-                for (let i = 0; i < (blockCounts.block4 || 0); i++) {
-                    blocks_html += `<div class="block" id="block${block_id}" data-type="for1"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />回繰り返す<br /></p></div>`;
-                    block_id++;
-                    number_id++;
-                }
-                for (let i = 0; i < (blockCounts.block5 || 0); i++) {
-                    blocks_html += `<div class="block" id="block${block_id}" data-type="for2"><p class="center">ここまで繰りかえす<br /></p></div>`;
-                    block_id++;
-                }
-                for (let i = 0; i < (blockCounts.block6 || 0); i++) {
-                    blocks_html += `<div class="block" id="block${block_id}" data-type="if1"><p class="center">壁にぶつかったら<br /></p></div>`;
-                    block_id++;
-                }
-                 for (let i = 0; i < (blockCounts.block7 || 0); i++) {
-                    blocks_html += `<div class="block" id="block${block_id}" data-type="if2"><p class="center">ここまでIF<br /></p></div>`;
-                    block_id++;
-                }
-
-                document.getElementById('block_area').innerHTML = blocks_html;
-                document.getElementById('generate_button_container').innerHTML = generate_html;
-                
-                $(".block").draggable({
-                    start: function () { $(this).addClass("block_drag").removeClass("block_snap"); },
-                    stop: function () { $(this).removeClass("block_drag"); create_array(); },
-                });
-            })
-            .catch(error => console.error('Error:', error));
-            
-        fetch(`static/json/tutorials_stage${stage}.json`)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error("チュートリアルファイルの読み込みに失敗しました。");
-                }
-                return res.json();
-            })
-            .then((steps) => {
-                intro.setOptions({
-                    showProgress: false,
-                    disableInteraction: true,
-                    exitOnEsc: false,
-                    exitOnOverlayClick: false,
-                    nextLabel: "次へ",
-                    prevLabel: "戻る",
-                    doneLabel: "完了",
-                    steps: steps,
-                });
-                intro.start();
-            })
-            .catch(error => console.error('Error:', error));
+    //////////////////
+    ///// 前進 //////
+    //////////////////
+    function fd(step) {
+      return new Promise((resolve) => {
+        let rect = maincanvas.getBoundingClientRect();
+        function fd_draw() {
+          mainCtx.strokeStyle = colorPicker.value;
+          if (step > 0) {
+            const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+            const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+            // 境界チェック 
+            if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { resolve(); return; }
+            const screenX = rect.left + window.pageXOffset + nextX;
+            const screenY = rect.top + window.pageYOffset + nextY;
+            for (const obstacle of obstacles) {
+              const bounds = getObstacleBounds(obstacle);
+              if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { resolve(); return; }
+            }
+            mainCtx.beginPath(); mainCtx.lineWidth = 10; mainCtx.moveTo(currentX, currentY);
+            currentX = nextX; currentY = nextY;
+            mainCtx.lineTo(currentX, currentY); mainCtx.stroke();
+            // タートルの位置を更新 
+            const turtle = document.getElementById("turtle");
+            const turtleWidth = turtle.offsetWidth; const turtleHeight = turtle.offsetHeight;
+            turtle.style.left = `${rect.left + window.pageXOffset + currentX + x - turtleWidth / 2}px`;
+            turtle.style.top = `${rect.top + window.pageYOffset + currentY - y - turtleHeight}px`;
+            step--;
+            // アニメーションが終了したらresolveを呼び出す 
+            if (step === 0) { resolve(); } else { requestAnimationFrame(fd_draw); }
+          } else { resolve(); }
+        }
+        fd_draw();
       });
-      
-      //////////////////
-      ////キャンバス/////
-      //////////////////
-      const gridSize = 100;
-      gridCtx.strokeStyle = "rgb(200, 200, 200)";
-      gridCtx.lineWidth = 1;
-      for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
-        if (i < gridcanvas.width) { gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke(); }
-        if (i < gridcanvas.height) { gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke(); }
+    }
+
+    // 右回転
+    function rt(angle) { a += angle; turtle.style.transform = `rotate(${a}deg)`; }
+    // 左回転
+    function lt(angle) { a -= angle; turtle.style.transform = `rotate(${a}deg)`; }
+
+    //////////////////
+    /////スタート//////
+    //////////////////
+    async function start() {
+      x = y = a = 0; turtle.style.transform = `rotate(${a}deg)`;
+      for (var i = 0; i < codeAreaSize; i++) { i = await processCode(i); }
+      document.dispatchEvent(new CustomEvent("paintdone"));
+    }
+
+    async function processCode(index) {
+      if (!code_array[index] || code_array[index][0] === 0) return index;
+      console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`); // デバッグメッセージ
+      switch (code_array[index][0]) {
+        case "fd": await fd(parseFloat(code_array[index][1].querySelector("input").value)); break;
+        case "rt": rt(parseFloat(code_array[index][1].querySelector("input").value)); break;
+        case "lt": lt(parseFloat(code_array[index][1].querySelector("input").value)); break;
+        case "for1":
+          const end_for_index = code_array.findIndex((row, i) => row[0] === "for2" && i > index);
+          if (end_for_index !== -1) {
+            const repeatCount = parseFloat(code_array[index][1].querySelector("input").value);
+            for (let j = 0; j < repeatCount; j++) { for (let k = index + 1; k < end_for_index; k++) { k = await processCode(k); } }
+            return end_for_index; //5の次のインデックスにジャンプ
+          } else { alert("繰り返しの終端が必要です。"); }
+          break;
+        case "if1":
+          const end_if_index = code_array.findIndex((row, i) => row[0] === "if2" && i > index);
+          if (end_if_index !== -1) {
+            let hit = false;
+            let rect = maincanvas.getBoundingClientRect();
+            const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
+            const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+            if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { hit = true; }
+            const screenX = rect.left + window.pageXOffset + nextX;
+            const screenY = rect.top + window.pageYOffset + nextY;
+            for (const obstacle of obstacles) {
+              const bounds = getObstacleBounds(obstacle);
+              if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { hit = true; break; }
+            }
+            if (hit) { for (let k = index + 1; k < end_if_index; k++) { k = await processCode(k); } }
+            return end_if_index;
+          } else { alert("IFの終端が必要です。"); }
+          break;
       }
-      mainCtx.strokeStyle = lineColor;
-      // イベントリスナーを追加して色の変更を検知する
-      colorPicker.addEventListener("input", function () { lineColor = colorPicker.value; mainCtx.strokeStyle = lineColor; });
-      maincanvas.addEventListener("click", (e) => {
-        let rect = e.target.getBoundingClientRect();
-        // ブラウザ上でのクリック位置を取得
-        const viewX = e.clientX - rect.left, viewY = e.clientY - rect.top;
-        // 表示サイズとキャンバスの実際のサイズ比率を計算
-        const scaleWidth = maincanvas.clientWidth / maincanvas.width, scaleHeight = maincanvas.clientHeight / maincanvas.height;
-        // ブラウザのクリック位置をキャンバス上の位置に変換
-        currentX = Math.floor(viewX / scaleWidth);
-        currentY = Math.floor(viewY / scaleHeight);
-        const turtle = document.getElementById("turtle");
-        // タートルの幅と高さを取得
-        const turtleWidth = turtle.offsetWidth;
-        const turtleHeight = turtle.offsetHeight;
-        // カメのしっぽの位置をクリック位置に合わせるための調整
-        turtle.style.position = "absolute";
-        turtle.style.left = `${rect.left + window.pageXOffset + currentX - turtleWidth / 2}px`;
-        turtle.style.top = `${rect.top + window.pageYOffset + currentY - turtleHeight}px`;
-      });
-      const obstacles = [];
-      let imageCounter = 0;
-      function block_Generate() {
-        const canvasWrapper = document.getElementById("canvas_wrapper");
-        const img = document.createElement("img");
-        img.src = "static/assets/Obstacle.png";
-        img.classList.add("draggable");
-        img.width = 50; img.height = 50;
-        const cols = Math.floor(maincanvas.width / 50);
-        const x = (imageCounter % cols) * 50;
-        const y = Math.floor(imageCounter / cols) * 50;
-        img.style.position = "absolute";
-        img.style.left = `${maincanvas.offsetLeft + x}px`;
-        img.style.top = `${maincanvas.offsetTop + y}px`;
-        canvasWrapper.appendChild(img);
-        imageCounter++;
-        obstacles.push(img);
-        $(img).draggable({ containment: "#canvas_wrapper" });
-      }
-      
-      //////////////////
-      //ドラッグ処理開始//
-      //////////////////
-      $(function () {
-        var now_object = null;
-        $(".blocksnap_area").droppable({
-          hoverClass: "block_hover",
-          //ドロップした時
-          drop: function (event, ui) {
-            now_object = ui.draggable;
-            now_object.offset({ top: $(this).offset().top, left: $(this).offset().left - 3, });
-            now_object.addClass("block_snap");
-          },
+      return index; // 次のインデックスに進む
+    }
+
+    //////////////////////////////////////////////////
+    ////////////答え合わせ部分///////////////////
+    //////////////////////////////////////////////////
+    async function check() {
+      try {
+        const userCanvas = document.getElementById('mainCanvas');
+        const correctImageElement = document.getElementById('overlayImage');
+
+        const correctImage = new Image();
+        correctImage.crossOrigin = "Anonymous";
+        correctImage.src = correctImageElement.src;
+        await new Promise((resolve, reject) => {
+          correctImage.onload = resolve;
+          correctImage.onerror = reject;
         });
-      });
-      
-      //////////////////
-      // 配列を作る ////
-      //////////////////
-      var code_array = Array(codeAreaSize).fill(0).map(() => Array(2).fill(0));
-      function create_array() {
-        // 各コードエリアとブロックの位置を取得
-        const codearea_top = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().top);
-        const codearea_left = Array.from({ length: 9 }, (_, i) => $(`#code_area${i + 1}`).offset().left);
-        let array_flag = 0;
-        // 上のエリアから順に何のブロックがドロップされているか検知
-        for (let i = 0; i < codeAreaSize; i++) {
-            array_flag = 0;
-            for (let j = 0; j < totalBlocks; j++) {
-                const block = $(`#block${j + 1}`);
-                if (block.length === 0) continue;
-                const block_top = block.offset().top;
-                const block_left = block.offset().left;
-                if (codearea_top[i] === block_top && codearea_left[i] === block_left + 3) {
-                    const element = document.getElementById(`block${j + 1}`);
-                    code_array[i][0] = element.dataset.type;
-                    code_array[i][1] = element;
-                    array_flag = 1;
-                    break; // マッチしたら内側のループを抜ける
-                }
-            }
-            // ブロックを検知できなかった時、0を入れる
-            if (array_flag === 0) { code_array[i][0] = 0; }
-        }
-        console.log("配列=", code_array);
-        document.dispatchEvent(new CustomEvent("codeArrayChanged"));
-      }
 
-      let flag = true;
-      function grid() {
-        if (flag) { gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height); flag = false; }
-        else {
-            for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
-                if (i < gridcanvas.width) { gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke(); }
-                if (i < gridcanvas.height) { gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke(); }
-            }
-            flag = true;
+        const userShape = getShapeData(userCanvas);
+        const correctShape = getShapeData(correctImage);
+
+        if (userShape.pixelCount === 0) {
+          console.log("何も描かれていないようです。");
+          showAnswerMark(false);
+          return;
         }
-      }
-      
-      //////////////////
-      ///// クリア //////
-      //////////////////
-      function clearbtn() {
-        mainCtx.fillStyle = "rgb(255, 255, 255)";
-        mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
-      }
-      function getObstacleBounds(obstacle) {
-        const rect = obstacle.getBoundingClientRect();
-        return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
-      }
-      
-      //////////////////
-      ///// 前進 //////
-      //////////////////
-      function fd(step) {
-        return new Promise((resolve) => {
-          let rect = maincanvas.getBoundingClientRect();
-          function fd_draw() {
-            mainCtx.strokeStyle = colorPicker.value;
-            if (step > 0) {
-              const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
-              const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
-              // 境界チェック 
-              if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { resolve(); return; }
-              const screenX = rect.left + window.pageXOffset + nextX;
-              const screenY = rect.top + window.pageYOffset + nextY;
-              for (const obstacle of obstacles) {
-                const bounds = getObstacleBounds(obstacle);
-                if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { resolve(); return; }
-              }
-              mainCtx.beginPath(); mainCtx.lineWidth = 10; mainCtx.moveTo(currentX, currentY);
-              currentX = nextX; currentY = nextY;
-              mainCtx.lineTo(currentX, currentY); mainCtx.stroke();
-              // タートルの位置を更新 
-              const turtle = document.getElementById("turtle");
-              const turtleWidth = turtle.offsetWidth; const turtleHeight = turtle.offsetHeight;
-              turtle.style.left = `${rect.left + window.pageXOffset + currentX + x - turtleWidth / 2}px`;
-              turtle.style.top = `${rect.top + window.pageYOffset + currentY - y - turtleHeight}px`;
-              step--;
-              // アニメーションが終了したらresolveを呼び出す 
-              if (step === 0) { resolve(); } else { requestAnimationFrame(fd_draw); }
-            } else { resolve(); }
+
+        const similarity = compareShapes(userShape, correctShape);
+
+        console.log(`類似度スコア: ${similarity.toFixed(3)}`);
+
+        const isCorrect = similarity >= 0.75;
+        showAnswerMark(isCorrect);
+
+        if (isCorrect) {
+          document.dispatchEvent(new CustomEvent("trianglecorrect"));
+          const nextButton = document.getElementById("btn_next");
+          if (nextButton) {
+            nextButton.style.visibility = "visible";
           }
-          fd_draw();
-        });
-      }
-
-      // 右回転
-      function rt(angle) { a += angle; turtle.style.transform = `rotate(${a}deg)`; }
-      // 左回転
-      function lt(angle) { a -= angle; turtle.style.transform = `rotate(${a}deg)`; }
-      
-      //////////////////
-      /////スタート//////
-      //////////////////
-      async function start() {
-        x = y = a = 0; turtle.style.transform = `rotate(${a}deg)`;
-        for (var i = 0; i < codeAreaSize; i++) { i = await processCode(i); }
-        document.dispatchEvent(new CustomEvent("paintdone"));
-      }
-
-      async function processCode(index) {
-        if (!code_array[index] || code_array[index][0] === 0) return index;
-        console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`); // デバッグメッセージ
-        switch (code_array[index][0]) {
-          case "fd": await fd(parseFloat(code_array[index][1].querySelector("input").value)); break;
-          case "rt": rt(parseFloat(code_array[index][1].querySelector("input").value)); break;
-          case "lt": lt(parseFloat(code_array[index][1].querySelector("input").value)); break;
-          case "for1":
-            const end_for_index = code_array.findIndex((row, i) => row[0] === "for2" && i > index);
-            if (end_for_index !== -1) {
-              const repeatCount = parseFloat(code_array[index][1].querySelector("input").value);
-              for (let j = 0; j < repeatCount; j++) { for (let k = index + 1; k < end_for_index; k++) { k = await processCode(k); } }
-              return end_for_index; //5の次のインデックスにジャンプ
-            } else { alert("繰り返しの終端が必要です。"); }
-            break;
-          case "if1":
-              const end_if_index = code_array.findIndex((row, i) => row[0] === "if2" && i > index);
-              if (end_if_index !== -1) {
-                  let hit = false;
-                  let rect = maincanvas.getBoundingClientRect();
-                  const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
-                  const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
-                  if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { hit = true; }
-                  const screenX = rect.left + window.pageXOffset + nextX;
-                  const screenY = rect.top + window.pageYOffset + nextY;
-                  for (const obstacle of obstacles) {
-                      const bounds = getObstacleBounds(obstacle);
-                      if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { hit = true; break; }
-                  }
-                  if (hit) { for (let k = index + 1; k < end_if_index; k++) { k = await processCode(k); } }
-                  return end_if_index;
-              } else { alert("IFの終端が必要です。"); }
-              break;
         }
-        return index; // 次のインデックスに進む
+
+      } catch (error) {
+        console.error("判定処理中にエラーが発生しました:", error);
+        showAnswerMark(false);
       }
-      
-      //////////////////////////////////////////////////
-      ////////////答え合わせ部分///////////////////
-      //////////////////////////////////////////////////
-      async function check() {
-        try {
-            const userCanvas = document.getElementById('mainCanvas');
-            const correctImageElement = document.getElementById('overlayImage');
+    }
 
-            const correctImage = new Image();
-            correctImage.crossOrigin = "Anonymous";
-            correctImage.src = correctImageElement.src;
-            await new Promise((resolve, reject) => {
-                correctImage.onload = resolve;
-                correctImage.onerror = reject;
-            });
+    function getShapeData(source) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 700;
+      canvas.height = 700;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
 
-            const userShape = getShapeData(userCanvas);
-            const correctShape = getShapeData(correctImage);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const binaryData = new Uint8Array(canvas.width * canvas.height);
 
-            if (userShape.pixelCount === 0) {
-                console.log("何も描かれていないようです。");
-                showAnswerMark(false);
-                return;
-            }
+      let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
+      let pixelCount = 0;
 
-            const similarity = compareShapes(userShape, correctShape);
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        const r = imageData.data[i];
+        const g = imageData.data[i + 1];
+        const b = imageData.data[i + 2];
+        const pixelIndex = i / 4;
 
-            console.log(`類似度スコア: ${similarity.toFixed(3)}`);
-
-            const isCorrect = similarity >= 0.75; 
-            showAnswerMark(isCorrect);
-
-            if (isCorrect) {
-                document.dispatchEvent(new CustomEvent("trianglecorrect"));
-                const nextButton = document.getElementById("btn_next");
-                if (nextButton) {
-                    nextButton.style.visibility = "visible";
-                }
-            }
-
-        } catch (error) {
-            console.error("判定処理中にエラーが発生しました:", error);
-            showAnswerMark(false);
+        if (r < 250 || g < 250 || b < 250) {
+          binaryData[pixelIndex] = 1;
+          pixelCount++;
+          const x = pixelIndex % canvas.width;
+          const y = Math.floor(pixelIndex / canvas.width);
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        } else {
+          binaryData[pixelIndex] = 0;
         }
       }
 
-      function getShapeData(source) {
-          const canvas = document.createElement('canvas');
-          canvas.width = 700;
-          canvas.height = 700;
-          const ctx = canvas.getContext('2d', { willReadFrequently: true });
-          ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
-          
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const binaryData = new Uint8Array(canvas.width * canvas.height);
-          
-          let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
-          let pixelCount = 0;
-          
-          for (let i = 0; i < imageData.data.length; i += 4) {
-              const r = imageData.data[i];
-              const g = imageData.data[i + 1];
-              const b = imageData.data[i + 2];
-              const pixelIndex = i / 4;
-              
-              if (r < 250 || g < 250 || b < 250) {
-                  binaryData[pixelIndex] = 1;
-                  pixelCount++;
-                  const x = pixelIndex % canvas.width;
-                  const y = Math.floor(pixelIndex / canvas.width);
-                  minX = Math.min(minX, x);
-                  minY = Math.min(minY, y);
-                  maxX = Math.max(maxX, x);
-                  maxY = Math.max(maxY, y);
-              } else {
-                  binaryData[pixelIndex] = 0;
-              }
+      const boundingBox = (pixelCount > 20) ? { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 } : null;
+
+      return {
+        binaryData: binaryData,
+        width: canvas.width,
+        height: canvas.height,
+        boundingBox: boundingBox,
+        pixelCount: pixelCount
+      };
+    }
+
+    function compareShapes(shapeA, shapeB) {
+      if (!shapeA.boundingBox || !shapeB.boundingBox) return 0;
+
+      const comparisonWidth = Math.max(shapeA.boundingBox.width, shapeB.boundingBox.width);
+      const comparisonHeight = Math.max(shapeA.boundingBox.height, shapeB.boundingBox.height);
+
+      const canvasA = document.createElement('canvas');
+      canvasA.width = comparisonWidth;
+      canvasA.height = comparisonHeight;
+      const ctxA = canvasA.getContext('2d');
+
+      const canvasB = document.createElement('canvas');
+      canvasB.width = comparisonWidth;
+      canvasB.height = comparisonHeight;
+      const ctxB = canvasB.getContext('2d');
+
+      const tempImgDataA = ctxA.createImageData(shapeA.boundingBox.width, shapeA.boundingBox.height);
+      const tempImgDataB = ctxB.createImageData(shapeB.boundingBox.width, shapeB.boundingBox.height);
+
+      for (let y = 0; y < shapeA.boundingBox.height; y++) {
+        for (let x = 0; x < shapeA.boundingBox.width; x++) {
+          const index = y * shapeA.boundingBox.width + x;
+          const originalIndex = (shapeA.boundingBox.y + y) * shapeA.width + (shapeA.boundingBox.x + x);
+          if (shapeA.binaryData[originalIndex] === 1) {
+            tempImgDataA.data[index * 4 + 3] = 255;
           }
+        }
+      }
+      ctxA.putImageData(tempImgDataA, (comparisonWidth - shapeA.boundingBox.width) / 2, (comparisonHeight - shapeA.boundingBox.height) / 2);
 
-          const boundingBox = (pixelCount > 20) ? { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 } : null;
-          
-          return {
-              binaryData: binaryData,
-              width: canvas.width,
-              height: canvas.height,
-              boundingBox: boundingBox,
-              pixelCount: pixelCount
+      for (let y = 0; y < shapeB.boundingBox.height; y++) {
+        for (let x = 0; x < shapeB.boundingBox.width; x++) {
+          const index = y * shapeB.boundingBox.width + x;
+          const originalIndex = (shapeB.boundingBox.y + y) * shapeB.width + (shapeB.boundingBox.x + x);
+          if (shapeB.binaryData[originalIndex] === 1) {
+            tempImgDataB.data[index * 4 + 3] = 255;
+          }
+        }
+      }
+      ctxB.putImageData(tempImgDataB, (comparisonWidth - shapeB.boundingBox.width) / 2, (comparisonHeight - shapeB.boundingBox.height) / 2);
+
+      const dataA = ctxA.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
+      const dataB = ctxB.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
+
+      let intersection = 0;
+      let union = 0;
+
+      for (let i = 0; i < dataA.length; i += 4) {
+        const pixelA = dataA[i + 3] > 0;
+        const pixelB = dataB[i + 3] > 0;
+
+        if (pixelA && pixelB) {
+          intersection++;
+        }
+        if (pixelA || pixelB) {
+          union++;
+        }
+      }
+
+      return union > 0 ? intersection / union : 0;
+    }
+
+    function next_stage() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const currentStage = parseInt(urlParams.get("stage") || "1");
+      if (currentStage >= 4) { window.location.href = "landing.html"; }
+      else { const nextStage = currentStage + 1; window.location.href = `TurtleGraphics.html?stage=${nextStage}`; }
+    }
+    function return_menu() { window.location.href = "landing.html"; }
+    function showAnswerMark(isCorrect) {
+      const mark = document.getElementById("answer-mark");
+      mark.textContent = isCorrect ? "〇" : "×";
+      mark.style.color = isCorrect ? "green" : "red";
+      mark.style.opacity = 1;
+      setTimeout(() => { mark.style.opacity = 0; }, 1500);
+    }
+
+
+    //////////////////////////////////////////////////
+    ////////////チュートリアル動作///////////////////
+    //////////////////////////////////////////////////
+    let intro = introJs();
+    let turtlePositionSet = false;
+    let blockSet = false;
+    let numSet = false;
+    let paintdone = false;
+    let chekdone = false;
+    let trianglecorrect1 = false;
+    let trianglecorrect2 = false;
+    let trianglecorrect3 = false;
+    let obstacleSet = false;
+
+    //一時停止用の制御
+    intro.onafterchange(function (targetElement) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const stage = urlParams.get('stage') || '1';
+      const currentStep = intro._currentStep;
+      if (stage === '1') {
+        //ユーザーがキャンバスをクリックするのを待つ
+        if (currentStep === 3 && !turtlePositionSet) {
+          intro.exit();
+          const canvas = document.getElementById("canvas_wrapper");
+          const handler = () => {
+            turtlePositionSet = true;
+            canvas.removeEventListener("click", handler);
+            intro.goToStep(4);
           };
-      }
-      
-      function compareShapes(shapeA, shapeB) {
-          if (!shapeA.boundingBox || !shapeB.boundingBox) return 0;
 
-          const comparisonWidth = Math.max(shapeA.boundingBox.width, shapeB.boundingBox.width);
-          const comparisonHeight = Math.max(shapeA.boundingBox.height, shapeB.boundingBox.height);
-          
-          const canvasA = document.createElement('canvas');
-          canvasA.width = comparisonWidth;
-          canvasA.height = comparisonHeight;
-          const ctxA = canvasA.getContext('2d');
-
-          const canvasB = document.createElement('canvas');
-          canvasB.width = comparisonWidth;
-          canvasB.height = comparisonHeight;
-          const ctxB = canvasB.getContext('2d');
-          
-          const tempImgDataA = ctxA.createImageData(shapeA.boundingBox.width, shapeA.boundingBox.height);
-          const tempImgDataB = ctxB.createImageData(shapeB.boundingBox.width, shapeB.boundingBox.height);
-
-          for (let y = 0; y < shapeA.boundingBox.height; y++) {
-            for (let x = 0; x < shapeA.boundingBox.width; x++) {
-              const index = y * shapeA.boundingBox.width + x;
-              const originalIndex = (shapeA.boundingBox.y + y) * shapeA.width + (shapeA.boundingBox.x + x);
-              if (shapeA.binaryData[originalIndex] === 1) {
-                tempImgDataA.data[index * 4 + 3] = 255;
-              }
-            }
-          }
-          ctxA.putImageData(tempImgDataA, (comparisonWidth - shapeA.boundingBox.width) / 2, (comparisonHeight - shapeA.boundingBox.height) / 2);
-
-          for (let y = 0; y < shapeB.boundingBox.height; y++) {
-            for (let x = 0; x < shapeB.boundingBox.width; x++) {
-              const index = y * shapeB.boundingBox.width + x;
-              const originalIndex = (shapeB.boundingBox.y + y) * shapeB.width + (shapeB.boundingBox.x + x);
-              if (shapeB.binaryData[originalIndex] === 1) {
-                tempImgDataB.data[index * 4 + 3] = 255;
-              }
-            }
-          }
-          ctxB.putImageData(tempImgDataB, (comparisonWidth - shapeB.boundingBox.width) / 2, (comparisonHeight - shapeB.boundingBox.height) / 2);
-          
-          const dataA = ctxA.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
-          const dataB = ctxB.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
-
-          let intersection = 0;
-          let union = 0;
-          
-          for (let i = 0; i < dataA.length; i += 4) {
-              const pixelA = dataA[i + 3] > 0;
-              const pixelB = dataB[i + 3] > 0;
-
-              if (pixelA && pixelB) {
-                  intersection++;
-              }
-              if (pixelA || pixelB) {
-                  union++;
-              }
-          }
-          
-          return union > 0 ? intersection / union : 0;
-      }
-
-      function next_stage() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentStage = parseInt(urlParams.get("stage") || "1");
-        if (currentStage >= 4) { window.location.href = "landing.html"; }
-        else { const nextStage = currentStage + 1; window.location.href = `TurtleGraphics.html?stage=${nextStage}`; }
-      }
-      function return_menu() { window.location.href = "landing.html"; }
-      function showAnswerMark(isCorrect) {
-        const mark = document.getElementById("answer-mark");
-        mark.textContent = isCorrect ? "〇" : "×";
-        mark.style.color = isCorrect ? "green" : "red";
-        mark.style.opacity = 1;
-        setTimeout(() => { mark.style.opacity = 0; }, 1500);
-      }
-
-
-      //////////////////////////////////////////////////
-      ////////////チュートリアル動作///////////////////
-      //////////////////////////////////////////////////
-      let intro = introJs();
-      let turtlePositionSet, blockSet, numSet, paintdone, chekdone, trianglecorrect1, trianglecorrect2, trianglecorrect3, obstacleSet = false;
-      intro.onafterchange(function (targetElement) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const stage = urlParams.get("stage") || "1";
-        const currentStep = intro._currentStep;
-
-        if (stage === "1") {
-            // ステップ2：「カメを〜クリックして」の後
-            if (currentStep === 2 && !turtlePositionSet) {
-                intro.exit(); // チュートリアルを一旦停止
-                // canvasがクリックされたら再開
-                document.getElementById("mainCanvas").addEventListener("click", function handler() {
-                    turtlePositionSet = true;
-                    this.removeEventListener('click', handler); // 一度だけ実行
-                    intro.nextStep(); // 次のステップへ
-                }, { once: true });
-            } 
-            // ステップ4：「ブロックを〜置いてみましょう」の後
-            else if (currentStep === 4 && !blockSet) {
-                intro.exit();
-                document.addEventListener("codeArrayChanged", function handler() {
-                    if (code_array.some(row => row[0] === "fd")) {
-                        blockSet = true;
-                        document.removeEventListener('codeArrayChanged', handler);
-                        intro.nextStep();
-                    }
-                });
-            } 
-            // ステップ5：「300と入力してください」の後
-            else if (currentStep === 5 && !numSet) {
-                intro.exit();
-                const checkInput = () => {
-                    const fdBlock = code_array.find(row => row[0] === "fd");
-                    if (fdBlock) {
-                        const numberInput = fdBlock[1].querySelector("input");
-                        const handler = function() {
-                            if (this.value === "300") {
-                                numSet = true;
-                                this.removeEventListener('input', handler);
-                                document.removeEventListener("codeArrayChanged", checkInput);
-                                intro.nextStep();
-                            }
-                        };
-                        numberInput.addEventListener("input", handler);
-                    }
-                };
-                document.addEventListener("codeArrayChanged", checkInput);
-                checkInput();
-            } 
-            // ステップ6：「STARTボタンを〜」の後
-            else if (currentStep === 6 && !paintdone) {
-                intro.exit();
-                document.addEventListener("paintdone", function handler() {
-                    paintdone = true;
-                    intro.nextStep();
-                }, { once: true });
-            } 
-            // ステップ7：「CHECKボタンで〜」の後
-            else if (currentStep === 7 && !chekdone) {
-                intro.exit();
-                document.addEventListener("click", function handler(e) {
-                    if(e.target.id === 'btn_check'){
-                        chekdone = true;
-                        document.removeEventListener('click', handler);
-                        // 正解が出るまで少し待ってから次に進む
-                        setTimeout(() => intro.nextStep(), 1500);
-                    }
-                });
-            }
-        } 
-        // --- ステージ2以降のロジックは変更ありません ---
-        else if (stage === "2" && currentStep === 4 && !trianglecorrect1) {
-             intro.exit();
-             document.addEventListener("trianglecorrect", () => { trianglecorrect1 = true; intro.nextStep(); }, { once: true });
-        } else if (stage === "3" && currentStep === 4 && !trianglecorrect2) {
-             intro.exit();
-             document.addEventListener("trianglecorrect", () => { trianglecorrect2 = true; intro.nextStep(); }, { once: true });
-        } else if (stage === "4") {
-            if (currentStep === 4 && !obstacleSet) {
-                intro.exit();
-                document.getElementById("blockGenerateButton").addEventListener("click", () => {
-                    obstacleSet = true;
-                    intro.nextStep();
-                }, { once: true });
-            } else if (currentStep === 8 && !trianglecorrect3) {
-                 intro.exit();
-                 document.addEventListener("trianglecorrect", () => { trianglecorrect3 = true; intro.nextStep(); }, { once: true });
-            }
+          canvas.addEventListener("click", handler);
         }
-      });
-    </script>
-  </body>
+        //ユーザーがブロックを配置するのを待つ
+        if (currentStep === 5 && !blockSet) {
+          intro.exit();
+          document.addEventListener('codeArrayChanged', function checkFdBlock() {
+            if (code_array[0][0] === "fd") {
+              blockSet = true;
+              document.removeEventListener('codeArrayChanged', checkFdBlock);
+              intro.goToStep(6);
+            }
+          });
+        }
+        //数値入力を待つ
+        if (currentStep === 6 && !numSet) {
+          intro.exit();
+          const setupInputListener = () => {
+            const numberInput = document.getElementById("number1");
+            if (numberInput) {
+              const inputHandler = function () {
+                if (this.value === "300") {
+                  numSet = true;
+                  this.removeEventListener("input", inputHandler);
+                  document.removeEventListener('codeArrayChanged', setupInputListener);
+                  intro.goToStep(7);
+                }
+              };
+              numberInput.addEventListener("input", inputHandler);
+              return true;
+            }
+            return false;
+          };
+          const success = setupInputListener();
+          if (!success) {
+            document.addEventListener('codeArrayChanged', setupInputListener, { once: true });
+          }
+        }
+        //ユーザーが描画完了するのを待つ
+        if (currentStep === 7 && !paintdone) {
+          intro.exit();
+          document.addEventListener('paintdone', function checkpaintdone() {
+            paintdone = true;
+            document.removeEventListener('paintdone', checkpaintdone);
+            intro.goToStep(8);
+          }, { once: true });
+        }
+        //ユーザーのチェック完了を待つ
+        if (currentStep === 8 && !chekdone) {
+          intro.exit();
+          const checkbtn = document.getElementById("btn_check");
+          const handler = () => {
+            chekdone = true;
+            checkbtn.removeEventListener("click", handler);
+            intro.goToStep(9);
+          };
+
+          checkbtn.addEventListener("click", handler, { once: true });
+        }
+      }
+      else if (stage === '2') {
+        if (currentStep === 5 && !trianglecorrect1) {
+          intro.exit();
+          //ユーザーが三角形を描画するのを待つ
+          document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+            trianglecorrect1 = true;
+            document.removeEventListener('trianglecorrect', checktrianglecorrect);
+            intro.goToStep(6).start();
+          }, { once: true });
+        }
+      }
+      else if (stage === '3') {
+        if (currentStep === 5 && !trianglecorrect2) {
+          intro.exit();
+          //ユーザーが三角形を描画するのを待つ
+          document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+            trianglecorrect2 = true;
+            document.removeEventListener('trianglecorrect', checktrianglecorrect);
+            intro.goToStep(6).start();
+          }, { once: true });
+        }
+      }
+      else if (stage === '4') {
+        if (currentStep === 5 && !obstacleSet) {
+          intro.exit();
+          // ユーザーが障害物を生成するのを待つ
+          const generatebutton = document.getElementById("blockGenerateButton");
+          const handler = () => {
+            obstacleSet = true; // フラグを更新
+            generatebutton.removeEventListener("click", handler); // イベントリスナーを削除
+            intro.goToStep(6); // 次のステップに進む
+          };
+          generatebutton.addEventListener("click", handler); // イベントリスナーを追加
+        }
+        if (currentStep === 9 && !trianglecorrect3) {
+          intro.exit();
+          //ユーザーが三角形を描画するのを待つ
+          document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+            trianglecorrect3 = true;
+            document.removeEventListener('trianglecorrect', checktrianglecorrect);
+            intro.goToStep(10).start();
+          }, { once: true });
+        }
+      }
+    });
+  </script>
+</body>
+
 </html>
