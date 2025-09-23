@@ -1,6 +1,6 @@
 [
     {
-        "element": "body",
+        "element": "#page",
         "intro": "次は「繰り返し」を使って、三角形を描いてみましょう！"
     },
     {
@@ -12,15 +12,15 @@
         "intro": "こちらも新しいブロックです。"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "それでは、ブロックを組み立てて三角形を描いてみましょう！"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "OK!繰り返しの使い方がわかりましたか？"
     },
     {

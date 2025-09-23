@@ -1,6 +1,6 @@
 [
     {
-       "element": "body",
+        "element": "#page",
         "intro": "次は分岐を使って三角形を描いてみましょう！"
     },
     {
@@ -12,7 +12,7 @@
         "intro": "こちらも新しいブロックです。"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "<p>この二つのブロックでほかのブロックを挟むことでカメが壁や障害物にぶつかったときの動作を指定できます。</p><img src='/static/assets/c4_img.png' style='width: 150px; display: block; margin: 8px auto;'>"
     },
     {
@@ -20,7 +20,7 @@
         "intro": "このボタンを押すと、障害物を出すことができます。試しに出してみましょう！"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "<p>障害物は自由に動かすことができます！</p><img src='/static/assets/c4_gif.gif' style='width: 150px; display: block; margin: 8px auto;'>"
     },
     {
@@ -28,15 +28,15 @@
         "intro": "このブロックは、999歩で決まっています。"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "歩数が決まっていないとき、どうやって三角形をかけるかな？"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "では、ブロックを組み立てて三角形を描いてみましょう！"
     },
     {
-        "element": "body",
+        "element": "#page",
         "intro": "OK!分岐の使い方がわかりましたか？"
     }
 ]

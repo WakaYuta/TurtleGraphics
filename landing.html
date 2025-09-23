@@ -1,53 +1,141 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>タートルグラフィックスでプログラミング学習</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f0f0f0;
-      }
-      .container {
-        text-align: center;
-      }
-      button {
-        padding: 10px 20px;
-        margin-top: 20px;
-        font-size: 16px;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>タートルグラフィックスでプログラミング学習</h1>
-      <h2>操作方法</h2>
-      <p>ブロックを使ってプログラミングしてカメを操作してください。</p>
-      <button id="startButton">スタート</button>
-      <h2>ステージ選択</h2>
-      <select id="stageSelect">
-        <option value="1">ステージ1</option>
-        <option value="2">ステージ2</option>
-        <option value="3">ステージ3</option>
-        <option value="4">ステージ4</option>
-      </select>
-    </div>
-    <script>
-      document
-        .getElementById("startButton")
-        .addEventListener("click", function () {
-          const stage = document.getElementById("stageSelect").value;
-          // Pythonサーバーを介さず、直接HTMLファイルにクエリパラメータを渡すように変更
-          window.location.href = `TurtleGraphics.html?stage=${stage}`;
-        });
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turtle Graphics - スタート画面</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:400,700,800&display=swap");
+
+    /* 全体の基本設定 */
+    body {
+      margin: 0;
+      font-family: "M PLUS Rounded 1c", sans-serif;
+      background-color: #f0f4f8;
+      /* TurtleGraphics.htmlとお揃いの背景色 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #3b4252;
+    }
+
+    /* 中央のカードデザイン */
+    .container {
+      background-color: #ffffff;
+      padding: 40px 50px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      border: 1px solid #e1e8ed;
+    }
+
+    /* カメのアイコン */
+    .turtle-icon {
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    /* タイトル */
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      /* 一番太い文字に */
+      color: #2e3440;
+      margin: 0 0 10px 0;
+    }
+
+    /* 説明文 */
+    p {
+      font-size: 16px;
+      color: #4c566a;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    /* ステージ選択のラベル */
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #2e3440;
+    }
+
+    /* プルダウンメニューのデザイン */
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 16px;
+      font-family: inherit;
+      border: 1px solid #d8e2eb;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      appearance: none;
+      /* ブラウザ標準の矢印を消す */
+      background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5z%22%20fill%3D%22%234C566A%22/%3E%3C/svg%3E');
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 20px;
+      cursor: pointer;
+    }
+
+    /* スタートボタン */
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 30px;
+      font-size: 18px;
+      font-family: inherit;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: #28a745;
+      /* 目立つ緑色 */
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      border-bottom: 3px solid #218838;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    button:active {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="turtle-icon">🐢</div>
+    <h1>タートルグラフィックス</h1>
+    <p>ブロックを並べてプログラミング！<br>カメを動かして、いろんな図形を描いてみよう。</p>
+
+    <label for="stageSelect">ステージ選択</label>
+    <select id="stageSelect">
+      <option value="1">ステージ1：直線を描こう</option>
+      <option value="2">ステージ2：三角形を描こう</option>
+      <option value="3">ステージ3：三角形を繰り返しで描こう</option>
+      <option value="4">ステージ4：三角形を分岐で描こう</option>
+    </select>
+
+    <button id="startButton">スタート！</button>
+  </div>
+
+  <script>
+    document
+      .getElementById("startButton")
+      .addEventListener("click", function () {
+        const stage = document.getElementById("stageSelect").value;
+        window.location.href = `TurtleGraphics.html?stage=${stage}`;
+      });
+  </script>
+</body>
+
 </html>
