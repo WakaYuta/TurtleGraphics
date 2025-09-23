@@ -15,11 +15,9 @@
         height: 100vh;
         background-color: #f0f0f0;
       }
-
       .container {
         text-align: center;
       }
-
       button {
         padding: 10px 20px;
         margin-top: 20px;
@@ -28,7 +26,6 @@
       }
     </style>
   </head>
-
   <body>
     <div class="container">
       <h1>タートルグラフィックスでプログラミング学習</h1>
@@ -48,14 +45,8 @@
         .getElementById("startButton")
         .addEventListener("click", function () {
           const stage = document.getElementById("stageSelect").value;
-          window.location.href = `TurtleGraphics?stage=${stage}`;
-        });
-
-      document
-        .getElementById("stageSelect")
-        .addEventListener("change", function () {
-          const stage = this.value;
-          window.app.setStage(stage);
+          // Pythonサーバーを介さず、直接HTMLファイルにクエリパラメータを渡すように変更
+          window.location.href = `TurtleGraphics.html?stage=${stage}`;
         });
     </script>
   </body>
