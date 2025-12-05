@@ -1,6 +1,9 @@
-@import url("https://fonts.googleapis.com/css?family=Kosugi");
+@import url("https://fonts.googleapis.com/css?family=Kosugi+Maru");
+@import url("https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:700&display=swap");
 
-/* 全体の基本設定 */
+/* --- 出典・参考スタイル：ネオ・ブルータリズム（Neo-Brutalism） --- */
+/* 動作安定版：おもちゃ箱テーマのレイアウトロジック ＋ ネオ・ブルータリズムのデザイン */
+
 * {
   box-sizing: border-box;
 }
@@ -9,61 +12,73 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: "Kosugi", sans-serif;
+  /* 画面幅に合わせる設定（スクロールバー対策） */
+  width: 100vw;
+  height: 100vh;
+  font-family: "M PLUS Rounded 1c", "Kosugi Maru", sans-serif;
   user-select: none;
-  background-color: #f0f4f8;
-  color: #333;
+  background-color: #FFF8E1;
+  color: #000000;
+  background-image: radial-gradient(#000000 10%, transparent 10%);
+  background-size: 24px 24px;
 }
 
 #turtle {
   transform-origin: 50% 100%;
+  transition: transform 0.5s ease-in-out;
+  z-index: 10;
+  /* 影なし！ */
 }
 
-/* --- 全体のレイアウト --- */
+/* --- メインレイアウト --- */
 #main {
   display: flex;
   flex-wrap: wrap;
-  padding: 20px;
+  padding: 10px;
   gap: 20px;
   justify-content: center;
   align-items: flex-start;
+  height: 100%;
+  /* 画面が小さくても内容が隠れないようにスクロール可 */
+  overflow-y: auto;
 }
 
-/* --- キャンバスエリア --- */
+/* --- 1. キャンバスエリア --- */
 #canvas_area {
   display: flex;
   flex-direction: column;
 }
 
 #taskname {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a3a53;
-  background-color: #ffffff;
-  padding: 15px;
-  border-radius: 12px 12px 0 0;
-  border: 1px solid #d8e2eb;
+  font-size: 20px;
+  font-weight: 900;
+  color: #000;
+  background-color: #FFD54F;
+  padding: 10px 15px;
+  border: 3px solid #000;
   border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 4px 4px 0px #000;
+  margin-right: -4px;
 }
 
 #canvas_wrapper {
   position: relative;
   width: 720px;
   height: 720px;
-  background-color: #ffffff;
-  border: 1px solid #d8e2eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-radius: 0 0 12px 12px;
+  background-color: #fff;
+  border: 3px solid #000;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 8px 8px 0px #000;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 .mark-icon {
   position: absolute;
-  font-size: 500px;
-  font-weight: bold;
-  color: green;
-  /* 正解は緑、×のときは JS 側で赤に変える */
+  font-size: 400px;
+  font-weight: 900;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -71,6 +86,8 @@ body {
   transition: opacity 0.3s ease;
   pointer-events: none;
   z-index: 3;
+  -webkit-text-stroke: 4px #000;
+  color: #FF5252;
 }
 
 #mainCanvas {
@@ -102,18 +119,19 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 10px 15px;
   background: #fff;
-  border: 1px solid #d8e2eb;
-  border-top: none;
-  border-radius: 0 0 12px 12px;
-  margin-top: -1px;
+  border: 3px solid #000;
+  border-radius: 10px;
+  margin-top: 15px;
+  box-shadow: 6px 6px 0px #000;
 }
 
 .color-picker-container {
-  margin: 20px;
   display: flex;
   align-items: center;
+  font-weight: 900;
+  font-size: 16px;
 }
 
 .color-picker-label {
@@ -121,188 +139,282 @@ body {
 }
 
 .color-picker {
-  border: none;
-  width: 40px;
-  height: 40px;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 3px solid #000;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   outline: none;
-}
-
-.color-picker:hover {
   cursor: pointer;
+  padding: 0;
+  box-shadow: 2px 2px 0px #000;
+  overflow: hidden;
+  background: none;
 }
 
-/* ボタン共通スタイル */
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+
+
+/* ========== ボタン共通設定 ========== */
 .btn {
-  padding: 14px 20px;
+  padding: 0 15px;
+  height: 44px;
   margin: 0;
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
-  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 900;
+  border: 3px solid #000;
+  transition: all 0.1s;
+  box-shadow: 4px 4px 0px #000;
+  transform: translate(0, 0);
+  background-color: #B0BEC5;
+  color: #000;
 }
 
-.btn_start {
-  flex: 1;
-  background-color: #28a745;
-  color: white;
-  height: 60px;
-}
-
-.btn_start:hover {
-  background-color: #218838;
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px 0px #000;
 }
 
 .btn_check {
-  background-color: #007bff;
-  color: white;
-  width: 200px;
+  background-color: #40C4FF;
+  width: 180px;
 }
 
 .btn_check:hover {
-  background-color: #0069d9;
+  background-color: #00B0FF;
+}
+
+#gridButton {
+  background-color: #ECEFF1;
+}
+
+#gridButton:hover {
+  background-color: #CFD8DC;
 }
 
 .btn_generate {
   cursor: pointer;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   margin: auto;
+  transition: transform 0.2s;
+  filter: drop-shadow(4px 4px 0px #000);
+}
+
+.btn_generate:hover {
+  transform: scale(1.1) rotate(5deg);
 }
 
 
-/* --- センターエリア --- */
+/* --- 2. センターエリア & 3. 右エリア --- */
 #center_area {
   display: flex;
   flex-direction: column;
   width: 280px;
-  gap: 20px;
+  /* 高さは指定しない（自然に任せる） */
+  gap: 15px;
 }
 
-#center_area>div:first-child {
+#right_area {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  gap: 15px;
+}
+
+/* ボタンコンテナ */
+.top-buttons {
   display: flex;
   gap: 10px;
+  width: 100%;
 }
 
-/* コードエリア */
+/* アクションボタン */
+.btn_action {
+  flex: 1;
+  height: 70px !important;
+  font-size: 18px;
+}
 
+#btn_start {
+  background-color: #69F0AE;
+}
+
+#btn_start:hover {
+  background-color: #00E676;
+}
+
+#btn_menu:hover,
+button[onclick="clearbtn()"]:hover {
+  background-color: #CFD8DC;
+}
+
+#btn_next {
+  background-color: #FF6E40;
+  visibility: hidden;
+}
+
+#btn_next:hover {
+  background-color: #FF9E80;
+}
+
+
+/* --- コードエリア --- */
 #code_area {
-  width: 100%;
   height: 726px;
   margin: 0;
-  border: 2px dashed #a9c2d7;
-  border-radius: 12px;
-  background-color: #f8f9fa;
-  padding: 10px 0;
+  border: 3px solid #000;
+  border-radius: 10px;
+  background-color: #fff;
+  padding: 5px 0;
+  box-shadow: 8px 8px 0px #000;
+  /* 以前のように単純なブロック配置に戻すため、flexなどの指定はあえて外します */
 }
 
 .blocksnap_area {
-  width: 225px;
+  width: 230px;
   height: 80px;
-  border-top: 2px dashed #d8e2eb;
+  border: 2px dashed #B0BEC5;
+  border-radius: 8px;
   margin: 0 auto;
+  background-color: #FAFAFA;
 }
 
 #code_area>.blocksnap_area:first-child {
   border-top: none;
+  border: 2px dashed #B0BEC5;
   padding-top: 2px;
 }
 
 /* --- ブロックエリア --- */
 #block_area {
-  width: 300px;
+  /* ドラッグ不具合の元凶「overflow」を削除！ */
+  /* heightも固定せず、中身に合わせて伸びるようにします */
   height: auto;
-  max-height: 800px;
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border: 1px solid #d8e2eb;
+  min-height: 500px;
+
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  border: 3px solid #000;
+  box-shadow: 8px 8px 0px #000;
 }
 
+/* ブロック本体 */
 .block {
   cursor: grab;
   position: relative;
+  /* おもちゃ箱テーマと同じマージン設定 */
   margin: 12px auto;
   padding: 0px;
-  width: 231px;
+
+  width: 230px;
   height: 80px;
-  background: rgb(214, 255, 248);
-  border-style: solid;
-  border-radius: 15px;
-  border-width: 1px;
-  display: block;
-  font-size: large;
+
+  background: #ffffff;
+  border: 3px solid #000;
+  border-radius: 8px;
   display: grid;
   place-items: center;
+  font-size: 16px;
+  font-weight: 900;
+  box-shadow: 4px 4px 0px #000;
+  transition: transform 0.1s;
+}
+
+.block:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
 }
 
 .block:active,
 .block_drag {
-  background: #b2ebf2;
-  border-bottom-width: 1px;
-  transform: translateY(2px);
+  background: #FFECB3;
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+  z-index: 9999;
 }
 
-.block_hover {
-  background: #f0f4f8;
+.block[data-type="fd"] {
+  border-left: 10px solid #FF5252;
 }
 
+.block[data-type="rt"] {
+  border-left: 10px solid #448AFF;
+}
+
+.block[data-type="lt"] {
+  border-left: 10px solid #448AFF;
+}
+
+.block[data-type="for1"],
+.block[data-type="for2"] {
+  border-left: 10px solid #69F0AE;
+}
+
+.block[data-type="if1"],
+.block[data-type="if2"] {
+  border-left: 10px solid #E040FB;
+}
+
+/* ★配置時のスタイル（おもちゃ箱テーマのロジックに戻しました）★ */
 .block_snap {
-  background: #d4edda;
-  border-color: #155724;
+  background: #F5F5F5;
+  border: 3px solid #000;
+  /* 配置されたらマージンを0にする（これで枠に収まる） */
   margin: 0;
+  box-shadow: none;
+  /* 絶対配置などは使いません */
+}
+
+.block_highlights {
+  background: #FFEA00 !important;
+  color: #000 !important;
+  border: 3px solid #000 !important;
+  box-shadow: 0 0 0 4px #FFEA00 !important;
+  transform: scale(1.05);
+  z-index: 20;
 }
 
 .block_numbox {
   width: 50px;
   height: 40px;
   margin: 0 5px;
-  font-size: 18px;
+  font-size: 20px;
   text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid #000;
+  border-radius: 6px;
+  background-color: #fff;
+  font-family: inherit;
+  font-weight: 900;
 }
 
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
-}
-
-/* --- その他エリア --- */
-#others_area {
-  width: 280px;
-}
-
-.btn_menu,
-.btn_next {
-  width: calc(50% - 5px);
-  display: inline-block;
   margin: 0;
-  padding: 12px;
-  font-size: 16px;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-  color: #333;
-  border: 1px solid #ddd;
 }
 
-.btn_menu:hover,
-.btn_next:hover {
-  background-color: #e2e6ea;
+.block_numbox[readonly] {
+  background-color: #E0E0E0;
+  color: #757575;
+  cursor: not-allowed;
 }
 
-.btn_next {
-  visibility: hidden;
-  float: right;
-}
-
-
-
-
-.center {
-  margin: 0;
+@media screen and (max-width: 1000px) {
+  #main {
+    flex-direction: column;
+    align-items: center;
+  }
 }

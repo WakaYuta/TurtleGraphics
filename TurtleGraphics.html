@@ -22,29 +22,28 @@
         </div>
         <div id="field">
           <div class="color-picker-container">
-            <label class="color-picker-label" for="colorPicker">Color Picker:</label>
+            <label class="color-picker-label" for="colorPicker">ペンの色</label>
             <input class="color-picker" type="color" id="colorPicker" value="#000000" />
           </div>
           <div id="generate_button_container"></div>
           <button class="btn" type="button" id="gridButton" onclick="grid()">
-            GridONOFF
+            グリッド
           </button>
           <button id="btn_check" class="btn btn_check" type="button" onclick="check()">
-            CHECK
+            チェック
           </button>
         </div>
       </div>
 
       <div id="center_area">
-        <div>
-          <button id="btn_start" class="btn btn_start" type="button" onclick="start()">
-            START
+        <div class="top-buttons">
+          <button id="btn_start" class="btn btn_action" type="button" onclick="start()">
+            スタート
           </button>
-          <button class="btn btn_start" type="button" onclick="clearbtn()">
-            CLEAR
+          <button class="btn btn_action" type="button" onclick="clearbtn()">
+            クリア
           </button>
         </div>
-
         <div id="code_area">
           <div id="code_area1" class="blocksnap_area"></div>
           <div id="code_area2" class="blocksnap_area"></div>
@@ -58,17 +57,18 @@
         </div>
       </div>
 
-      <div id="block_area"></div>
-      <div id="others_area">
-        <div id="help">
-          <button id="btn_menu" class="btn_menu" type="button" onclick="return_menu()">
-            menu
+      <div id="right_area">
+        <div class="top-buttons">
+          <button id="btn_menu" class="btn btn_action" type="button" onclick="return_menu()">
+            メニュー
           </button>
-          <button id="btn_next" class="btn_next" type="button" onclick="next_stage()">
-            next
+          <button id="btn_next" class="btn btn_action" type="button" onclick="next_stage()">
+            次へ
           </button>
         </div>
+        <div id="block_area"></div>
       </div>
+
     </div>
   </div>
 
@@ -132,11 +132,11 @@
 
           for (let i = 0; i < (blockCounts.block1 || 0); i++) {
             if (stage === "4") {
-              blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" value="999" min="0" max="999"  />歩進む<br /></p></div>`;
+              blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" value="999" min="0" max="999" readonly />歩進む<br /></p></div>`;
             } else {
               blocks_html += `<div class="block" id="block${block_id}" data-type="fd"><p class="center"><input type="number" id="number${number_id}" class="block_numbox" min="0" max="999" />歩進む<br /></p></div>`;
-              number_id++;
             }
+            number_id++;
             block_id++;
           }
           for (let i = 0; i < (blockCounts.block2 || 0); i++) {
@@ -381,9 +381,25 @@
     }
 
     // 右回転
-    function rt(angle) { a += angle; turtle.style.transform = `rotate(${a}deg)`; }
+    function rt(angle) {
+      return new Promise((resolve) => {
+        a += angle;
+        const turtle = document.getElementById("turtle");
+        turtle.style.transform = `rotate(${a}deg)`;
+        // CSSで設定した0.5秒のトランジションを待機
+        setTimeout(resolve, 500);
+      });
+    }
     // 左回転
-    function lt(angle) { a -= angle; turtle.style.transform = `rotate(${a}deg)`; }
+    function lt(angle) {
+      return new Promise((resolve) => {
+        a -= angle;
+        const turtle = document.getElementById("turtle");
+        turtle.style.transform = `rotate(${a}deg)`;
+        // CSSで設定した0.5秒のトランジションを待機
+        setTimeout(resolve, 500);
+      });
+    }
 
     //////////////////
     /////スタート//////
@@ -396,17 +412,31 @@
 
     async function processCode(index) {
       if (!code_array[index] || code_array[index][0] === 0) return index;
+
+      const blockElement = code_array[index][1];
+
+      //ハイライト表示開始
+      blockElement.classList.add("block_highlights");
+
       console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`); // デバッグメッセージ
+
+      let nextIndex = index; // 次に実行するブロックのインデックスを保持します
+
       switch (code_array[index][0]) {
-        case "fd": await fd(parseFloat(code_array[index][1].querySelector("input").value)); break;
-        case "rt": rt(parseFloat(code_array[index][1].querySelector("input").value)); break;
-        case "lt": lt(parseFloat(code_array[index][1].querySelector("input").value)); break;
+        case "fd": await fd(parseFloat(blockElement.querySelector("input").value)); break;
+        case "rt": await rt(parseFloat(blockElement.querySelector("input").value)); break;
+        case "lt": await lt(parseFloat(blockElement.querySelector("input").value)); break;
         case "for1":
           const end_for_index = code_array.findIndex((row, i) => row[0] === "for2" && i > index);
           if (end_for_index !== -1) {
-            const repeatCount = parseFloat(code_array[index][1].querySelector("input").value);
-            for (let j = 0; j < repeatCount; j++) { for (let k = index + 1; k < end_for_index; k++) { k = await processCode(k); } }
-            return end_for_index; //5の次のインデックスにジャンプ
+            const repeatCount = parseFloat(blockElement.querySelector("input").value);
+            for (let j = 0; j < repeatCount; j++) {
+              // ループ内のブロック実行は再帰的に processCode を呼び出します
+              for (let k = index + 1; k < end_for_index; k++) {
+                k = await processCode(k);
+              }
+            }
+            nextIndex = end_for_index; // 繰り返しブロックの終端にジャンプします
           } else { alert("繰り返しの終端が必要です。"); }
           break;
         case "if1":
@@ -423,12 +453,26 @@
               const bounds = getObstacleBounds(obstacle);
               if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { hit = true; break; }
             }
-            if (hit) { for (let k = index + 1; k < end_if_index; k++) { k = await processCode(k); } }
-            return end_if_index;
+
+            if (hit) {
+              // IF条件が真の場合、内部のブロックを実行します
+              for (let k = index + 1; k < end_if_index; k++) {
+                k = await processCode(k);
+              }
+            }
+            nextIndex = end_if_index; // IFブロックの終端にジャンプします
           } else { alert("IFの終端が必要です。"); }
           break;
+        case "for2":
+        case "if2":
+          // 終端ブロックでは特に処理なし
+          break;
       }
-      return index; // 次のインデックスに進む
+
+      // 3. ハイライト表示終了
+      blockElement.classList.remove("block_highlights");
+
+      return nextIndex; // 次のインデックスに進むか、スキップしたインデックスを返します
     }
 
     //////////////////////////////////////////////////
