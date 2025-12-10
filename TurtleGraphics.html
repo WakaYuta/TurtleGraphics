@@ -19,6 +19,7 @@
           <canvas id="mainCanvas" width="700" height="700"></canvas>
           <canvas id="gridCanvas" width="700" height="700"></canvas>
           <img id="overlayImage" src="" />
+          <img src="static/assets/turtle.png" id="turtle" style="position: absolute; top: 450px; left: 450px" />
         </div>
         <div id="field">
           <div class="color-picker-container">
@@ -79,7 +80,7 @@
     </div>
   </div>
 
-  <img src="static/assets/turtle.png" id="turtle" style="position: absolute; top: 450px; left: 450px" />
+
   <script src="static/js/intro.min.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
@@ -319,22 +320,20 @@
     colorPicker.addEventListener("input", function () { lineColor = colorPicker.value; mainCtx.strokeStyle = lineColor; });
     maincanvas.addEventListener("click", (e) => {
       let rect = e.target.getBoundingClientRect();
-      // ブラウザ上でのクリック位置を取得
       const viewX = e.clientX - rect.left, viewY = e.clientY - rect.top;
-      // 表示サイズとキャンバスの実際のサイズ比率を計算
       const scaleWidth = maincanvas.clientWidth / maincanvas.width, scaleHeight = maincanvas.clientHeight / maincanvas.height;
-      // ブラウザのクリック位置をキャンバス上の位置に変換
       currentX = Math.floor(viewX / scaleWidth);
       currentY = Math.floor(viewY / scaleHeight);
+
       const turtle = document.getElementById("turtle");
-      // タートルの幅と高さを取得
       const turtleWidth = turtle.offsetWidth;
       const turtleHeight = turtle.offsetHeight;
-      // カメのしっぽの位置をクリック位置に合わせるための調整
+
       turtle.style.position = "absolute";
-      turtle.style.left = `${rect.left + window.pageXOffset + currentX - turtleWidth / 2}px`;
-      turtle.style.top = `${rect.top + window.pageYOffset + currentY - turtleHeight}px`;
-      //クリック時にカメの向きをリセット
+      turtle.style.left = `${currentX - turtleWidth / 2}px`;
+      turtle.style.top = `${currentY - turtleHeight}px`;
+
+      // クリック時にカメの向きをリセット
       a = 0;
       turtle.style.transform = `rotate(${a}deg)`;
     });
@@ -479,8 +478,9 @@
 
             const turtle = document.getElementById("turtle");
             const turtleWidth = turtle.offsetWidth; const turtleHeight = turtle.offsetHeight;
-            turtle.style.left = `${rect.left + window.pageXOffset + currentX + x - turtleWidth / 2}px`;
-            turtle.style.top = `${rect.top + window.pageYOffset + currentY - y - turtleHeight}px`;
+
+            turtle.style.left = `${currentX + x - turtleWidth / 2}px`;
+            turtle.style.top = `${currentY - y - turtleHeight}px`;
 
             // 進んだ分だけ残り距離を減らす
             remainingDistance -= moveStep;
