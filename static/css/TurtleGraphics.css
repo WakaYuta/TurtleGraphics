@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Kosugi+Maru");
 @import url("https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:700&display=swap");
 
+/* --- ベース設定 --- */
 * {
   box-sizing: border-box;
 }
@@ -9,7 +10,6 @@ html,
 body {
   margin: 0;
   padding: 0;
-  /* 画面幅に合わせる設定（スクロールバー対策） */
   width: 100vw;
   height: 100vh;
   font-family: "M PLUS Rounded 1c", "Kosugi Maru", sans-serif;
@@ -24,7 +24,6 @@ body {
   transform-origin: 50% 100%;
   transition: transform 0.5s ease-in-out;
   z-index: 10;
-  /* 影なし！ */
 }
 
 /* --- メインレイアウト --- */
@@ -36,7 +35,6 @@ body {
   justify-content: center;
   align-items: flex-start;
   height: 100%;
-  /* 画面が小さくても内容が隠れないようにスクロール可 */
   overflow-y: auto;
 }
 
@@ -219,7 +217,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 280px;
-  /* 高さは指定しない（自然に任せる） */
+  height: 100%;
   gap: 15px;
 }
 
@@ -227,6 +225,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 300px;
+  height: auto;
   gap: 15px;
 }
 
@@ -237,7 +236,7 @@ body {
   width: 100%;
 }
 
-/* アクションボタン */
+/* ========== アクションボタン ========== */
 .btn_action {
   flex: 1;
   height: 70px !important;
@@ -250,6 +249,16 @@ body {
 
 #btn_start:hover {
   background-color: #00E676;
+}
+
+/* 停止ボタン */
+.btn_stop_style {
+  background-color: #EF5350 !important;
+  color: #fff !important;
+}
+
+.btn_stop_style:hover {
+  background-color: #E53935 !important;
 }
 
 #btn_menu:hover,
@@ -266,32 +275,27 @@ button[onclick="clearbtn()"]:hover {
   background-color: #FF9E80;
 }
 
-/* ストップボタンの色設定 */
-.btn_stop_style {
-  background-color: #EF5350 !important;
-  color: #fff !important;
-}
-
-.btn_stop_style:hover {
-  background-color: #E53935 !important;
-}
-
 
 /* --- コードエリア --- */
 #code_area {
-  height: auto;
+  height: 726px;
   margin: 0;
   border: 3px solid #000;
   border-radius: 10px;
   background-color: #fff;
   padding: 5px 0;
   box-shadow: 8px 8px 0px #000;
-  /* 以前のように単純なブロック配置に戻すため、flexなどの指定はあえて外します */
+  /* ブロック中央寄せ */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* 枠とブロックのサイズ一致（230px） */
 .blocksnap_area {
   width: 230px;
   height: 80px;
+
   border: 2px dashed #B0BEC5;
   border-radius: 8px;
   margin: 0 auto;
@@ -306,11 +310,8 @@ button[onclick="clearbtn()"]:hover {
 
 /* --- ブロックエリア --- */
 #block_area {
-  /* ドラッグ不具合の元凶「overflow」を削除！ */
-  /* heightも固定せず、中身に合わせて伸びるようにします */
   height: auto;
-  min-height: 500px;
-
+  min-height: 200px;
   background: #fff;
   padding: 15px;
   border-radius: 10px;
@@ -322,10 +323,10 @@ button[onclick="clearbtn()"]:hover {
 .block {
   cursor: grab;
   position: relative;
-  /* おもちゃ箱テーマと同じマージン設定 */
   margin: 12px auto;
   padding: 0px;
 
+  /* 枠と同じサイズ */
   width: 230px;
   height: 80px;
 
@@ -375,14 +376,12 @@ button[onclick="clearbtn()"]:hover {
   border-left: 10px solid #E040FB;
 }
 
-/* ★配置時のスタイル（おもちゃ箱テーマのロジックに戻しました）★ */
+/* 配置時のスタイル */
 .block_snap {
   background: #F5F5F5;
   border: 3px solid #000;
-  /* 配置されたらマージンを0にする（これで枠に収まる） */
   margin: 0;
   box-shadow: none;
-  /* 絶対配置などは使いません */
 }
 
 .block_highlights {
@@ -430,7 +429,7 @@ input[type="number"]::-webkit-inner-spin-button {
    Intro.js（チュートリアル）のスタイル上書き
    ========================================= */
 
-/*吹き出し本体*/
+/* 吹き出し本体 */
 .introjs-tooltip {
   background-color: #fff;
   border: 3px solid #000;
@@ -440,7 +439,6 @@ input[type="number"]::-webkit-inner-spin-button {
   font-family: "M PLUS Rounded 1c", "Kosugi Maru", sans-serif;
   max-width: 400px;
   padding: 0;
-  /* 内部の余白は個別に調整 */
 }
 
 /* 本文 */
@@ -458,7 +456,6 @@ input[type="number"]::-webkit-inner-spin-button {
   background-color: #FFF8E1;
   padding: 10px;
   border-radius: 0 0 7px 7px;
-  /* 下部の角丸 */
   text-align: right;
 }
 
@@ -472,16 +469,13 @@ input[type="number"]::-webkit-inner-spin-button {
   font-weight: 900;
   color: #000;
   background-color: #B0BEC5;
-  /* デフォルト（戻るなど） */
   border: 3px solid #000;
   border-radius: 6px;
   text-shadow: none;
   box-shadow: 4px 4px 0px #000;
-  /* 影 */
   transition: all 0.1s;
   cursor: pointer;
   text-decoration: none;
-  /* 下線を消す */
 }
 
 /* ボタンホバー・クリック時 */
@@ -491,16 +485,14 @@ input[type="number"]::-webkit-inner-spin-button {
   outline: none;
   border-color: #000;
   transform: translate(-1px, -1px);
-  /* 少し浮く */
 }
 
 .introjs-button:active {
   transform: translate(3px, 3px);
-  /* 影の位置に沈む */
   box-shadow: 1px 1px 0px #000;
 }
 
-/* 「次へ」「完了」ボタンを目立たせる */
+/* 「次へ」「完了」ボタン */
 .introjs-nextbutton,
 .introjs-donebutton {
   background-color: #69F0AE !important;
@@ -524,7 +516,7 @@ input[type="number"]::-webkit-inner-spin-button {
   transform: none;
 }
 
-/*矢印の色調整 */
+/* 矢印の色調整 */
 .introjs-arrow.top {
   border-bottom-color: #000;
   top: -13px;
@@ -545,7 +537,7 @@ input[type="number"]::-webkit-inner-spin-button {
   left: -13px;
 }
 
-/*ハイライトされている要素の周り */
+/* ハイライト枠 */
 .introjs-helperLayer {
   border: 3px solid #FFEA00;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 234, 0, 0.5);
@@ -553,13 +545,13 @@ input[type="number"]::-webkit-inner-spin-button {
   border-radius: 8px;
 }
 
-/*オーバーレイ（背景の暗さ） */
+/* オーバーレイ */
 .introjs-overlay {
   background-color: #000 !important;
   opacity: 0.6 !important;
 }
 
-/*進捗 */
+/* 進捗 */
 .introjs-bullets ul li a {
   background: #ccc;
   width: 10px;
