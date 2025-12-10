@@ -282,7 +282,7 @@ button[onclick="clearbtn()"]:hover {
 
 /* --- コードエリア --- */
 #code_area {
-  height: 726px;
+  height: auto;
   margin: 0;
   border: 3px solid #000;
   border-radius: 10px;
@@ -427,4 +427,151 @@ input[type="number"]::-webkit-inner-spin-button {
     flex-direction: column;
     align-items: center;
   }
+}
+
+/* =========================================
+   Intro.js（チュートリアル）のスタイル上書き
+   ========================================= */
+
+/*吹き出し本体*/
+.introjs-tooltip {
+  background-color: #fff;
+  border: 3px solid #000;
+  border-radius: 10px;
+  box-shadow: 8px 8px 0px #000;
+  color: #000;
+  font-family: "M PLUS Rounded 1c", "Kosugi Maru", sans-serif;
+  max-width: 400px;
+  padding: 0;
+  /* 内部の余白は個別に調整 */
+}
+
+/* 本文 */
+.introjs-tooltiptext {
+  font-size: 15px;
+  font-weight: 700;
+  color: #333;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* ボタンエリア */
+.introjs-tooltipbuttons {
+  border-top: 3px solid #000;
+  background-color: #FFF8E1;
+  padding: 10px;
+  border-radius: 0 0 7px 7px;
+  /* 下部の角丸 */
+  text-align: right;
+}
+
+/* チュートリアル用のボタン */
+.introjs-button {
+  display: inline-block;
+  padding: 8px 16px;
+  margin-left: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 900;
+  color: #000;
+  background-color: #B0BEC5;
+  /* デフォルト（戻るなど） */
+  border: 3px solid #000;
+  border-radius: 6px;
+  text-shadow: none;
+  box-shadow: 4px 4px 0px #000;
+  /* 影 */
+  transition: all 0.1s;
+  cursor: pointer;
+  text-decoration: none;
+  /* 下線を消す */
+}
+
+/* ボタンホバー・クリック時 */
+.introjs-button:hover,
+.introjs-button:focus {
+  background-color: #CFD8DC;
+  outline: none;
+  border-color: #000;
+  transform: translate(-1px, -1px);
+  /* 少し浮く */
+}
+
+.introjs-button:active {
+  transform: translate(3px, 3px);
+  /* 影の位置に沈む */
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* 「次へ」「完了」ボタンを目立たせる */
+.introjs-nextbutton,
+.introjs-donebutton {
+  background-color: #69F0AE !important;
+  color: #000 !important;
+}
+
+.introjs-nextbutton:hover,
+.introjs-donebutton:hover {
+  background-color: #00E676 !important;
+}
+
+/* 無効化されたボタン */
+.introjs-disabled,
+.introjs-disabled:hover,
+.introjs-disabled:focus {
+  color: #9E9E9E;
+  background-color: #E0E0E0;
+  border-color: #9E9E9E;
+  box-shadow: none;
+  cursor: default;
+  transform: none;
+}
+
+/*矢印の色調整 */
+.introjs-arrow.top {
+  border-bottom-color: #000;
+  top: -13px;
+}
+
+.introjs-arrow.bottom {
+  border-top-color: #000;
+  bottom: -13px;
+}
+
+.introjs-arrow.right {
+  border-left-color: #000;
+  right: -13px;
+}
+
+.introjs-arrow.left {
+  border-right-color: #000;
+  left: -13px;
+}
+
+/*ハイライトされている要素の周り */
+.introjs-helperLayer {
+  border: 3px solid #FFEA00;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 234, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+/*オーバーレイ（背景の暗さ） */
+.introjs-overlay {
+  background-color: #000 !important;
+  opacity: 0.6 !important;
+}
+
+/*進捗 */
+.introjs-bullets ul li a {
+  background: #ccc;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #000;
+  transition: all 0.2s;
+}
+
+.introjs-bullets ul li a.active {
+  background: #FF6E40;
+  transform: scale(1.2);
 }
