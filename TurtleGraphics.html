@@ -124,6 +124,9 @@
           document.getElementById('taskname').textContent = stageInfo.title;
           document.getElementById('overlayImage').src = `static/assets/${stageInfo.image}`;
 
+          ////////////////////////////
+          //jsonに基づいてブロック生成//
+          ////////////////////////////
           let blocks_html = '';
           let generate_html = '';
           let block_id = 1;
@@ -211,15 +214,92 @@
     });
 
     //////////////////
-    ////キャンバス/////
+    ///グリッド描画////
     //////////////////
     const gridSize = 100;
-    gridCtx.strokeStyle = "rgb(200, 200, 200)";
-    gridCtx.lineWidth = 1;
-    for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
-      if (i < gridcanvas.width) { gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke(); }
-      if (i < gridcanvas.height) { gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke(); }
+
+    function drawGrid() {
+      // 2. 薄いグリッド線を描く
+      gridCtx.strokeStyle = "rgb(230, 230, 230)"; // 薄めのグレー
+      gridCtx.lineWidth = 1;
+
+      for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
+        if (i < gridcanvas.width) {
+          gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke();
+        }
+        if (i < gridcanvas.height) {
+          gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke();
+        }
+      }
+
+      // 3. 右下に「L字型のスケールバー」を描く
+      const barLength = 100;
+
+      // コーナーの位置を計算（キャンバスの右下隅のグリッドに合わせる）
+      // キャンバス幅(700)ピッタリだと線が切れることがあるので、線の太さ分(1.5px)だけ内側にずらします
+      const cornerX = (Math.floor(gridcanvas.width / gridSize) * gridSize) - 1.5;
+      const cornerY = (Math.floor(gridcanvas.height / gridSize) * gridSize) - 1.5;
+
+      // スタート位置（コーナーから100歩戻ったところ）
+      const hStartX = cornerX - barLength; // 横棒の左端
+      const vStartY = cornerY - barLength; // 縦棒の上端
+
+      gridCtx.strokeStyle = "rgb(100, 100, 100)"; // 少し濃いグレー
+      gridCtx.lineWidth = 3; // 太線
+      gridCtx.beginPath();
+
+      // 横線（左から右下の角へ）
+      gridCtx.moveTo(hStartX, cornerY);
+      gridCtx.lineTo(cornerX, cornerY);
+
+      // 縦線（上から右下の角へ）
+      // これで「_|」のような形で角がくっつきます
+      gridCtx.moveTo(cornerX, vStartY);
+      gridCtx.lineTo(cornerX, cornerY);
+
+      // 端っこの「チョン」とした線（目盛り）
+      const tickSize = 6;
+
+      // 横棒の左端の目盛り
+      gridCtx.moveTo(hStartX, cornerY - tickSize);
+      gridCtx.lineTo(hStartX, cornerY + tickSize);
+
+      // 縦棒の上端の目盛り
+      gridCtx.moveTo(cornerX - tickSize, vStartY);
+      gridCtx.lineTo(cornerX + tickSize, vStartY);
+
+      gridCtx.stroke();
+
+      // 文字を描く
+      gridCtx.fillStyle = "rgb(100, 100, 100)";
+      gridCtx.font = "bold 14px sans-serif";
+
+      // 横の「100歩」
+      gridCtx.textAlign = "center";
+      gridCtx.textBaseline = "bottom";
+      gridCtx.fillText("100歩", hStartX + (barLength / 2), cornerY - 8);
+
+      // 縦の「100歩」
+      gridCtx.textAlign = "right";
+      gridCtx.textBaseline = "middle";
+      gridCtx.fillText("100歩", cornerX - 10, vStartY + (barLength / 2));
     }
+    drawGrid();
+    let flag = true;
+    function grid() {
+      if (flag) {
+        gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height);
+        flag = false;
+      }
+      else {
+        drawGrid();
+        flag = true;
+      }
+    }
+
+    //////////////////
+    //クリックイベント//
+    //////////////////
     mainCtx.strokeStyle = lineColor;
     // イベントリスナーを追加して色の変更を検知する
     colorPicker.addEventListener("input", function () { lineColor = colorPicker.value; mainCtx.strokeStyle = lineColor; });
@@ -244,8 +324,13 @@
       a = 0;
       turtle.style.transform = `rotate(${a}deg)`;
     });
+
+    //////////////////
+    ////障害物生成/////
+    //////////////////
     const obstacles = [];
     let imageCounter = 0;
+
     function block_Generate() {
       const canvasWrapper = document.getElementById("canvas_wrapper");
       const img = document.createElement("img");
@@ -326,19 +411,6 @@
 
       console.log("配列=", code_array);
       document.dispatchEvent(new CustomEvent("codeArrayChanged"));
-    }
-
-
-    let flag = true;
-    function grid() {
-      if (flag) { gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height); flag = false; }
-      else {
-        for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
-          if (i < gridcanvas.width) { gridCtx.beginPath(); gridCtx.moveTo(i, 0); gridCtx.lineTo(i, gridcanvas.height); gridCtx.stroke(); }
-          if (i < gridcanvas.height) { gridCtx.beginPath(); gridCtx.moveTo(0, i); gridCtx.lineTo(gridcanvas.width, i); gridCtx.stroke(); }
-        }
-        flag = true;
-      }
     }
 
     //////////////////
@@ -530,9 +602,9 @@
       return nextIndex; // 次インデックス返却
     }
 
-    //////////////////////////////////////////////////
-    ////////////答え合わせ部分///////////////////
-    //////////////////////////////////////////////////
+    //////////////////
+    ////一致判定/////
+    //////////////////
     async function check() {
       try {
         const userCanvas = document.getElementById('mainCanvas');
@@ -698,9 +770,9 @@
     }
 
 
-    //////////////////////////////////////////////////
-    ////////////チュートリアル動作///////////////////
-    //////////////////////////////////////////////////
+    //////////////////
+    //チュートリアル///
+    //////////////////
     let intro = introJs();
     let turtlePositionSet = false;
     let blockSet = false;

@@ -5,14 +5,14 @@
     },
     {
         "element": "#block3",
-        "intro": "新しく使えるブロックが増えました。"
+        "intro": "繰り返しブロックが増えました。"
     },
     {
         "element": "#block4",
-        "intro": "こちらも新しいブロックです。"
+        "intro": "ここまで繰り返すブロックです。"
     },
     {
-        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。,</p><img src='/static/assets/c3_img.png' style='width: 150px; display: block; margin: 8px auto;'>",
+        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。</p><img src='/static/assets/c3_gif.gif' style='width: 200px; display: block; margin: 8px auto;'>",
         "position": "floating"
     },
     {
@@ -20,7 +20,12 @@
         "position": "floating"
     },
     {
+        "element": "#page",
+        "intro": "<p>OK!繰り返しを使うことで、同じ結果でもブロックの数を少なくすることができます！</p><img src='/static/assets/c3_img.png' style='width: 400px; display: block; margin: 8px auto;'><p>↑ 繰り返しを使うほうが短くてきれい！</p>",
+        "position": "floating"
+    },
+    {
         "element": "#btn_next",
-        "intro": "OK!繰り返しの使い方がわかりましたか？<br>「NEXT」をクリックして、つぎのステージに進みましょう！"
+        "intro": "「次へ」を押して次の問題に挑戦してください！"
     }
 ]

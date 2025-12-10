@@ -38,7 +38,7 @@ body {
   overflow-y: auto;
 }
 
-/* --- 1. キャンバスエリア --- */
+/* --- キャンバスエリア --- */
 #canvas_area {
   display: flex;
   flex-direction: column;
@@ -212,7 +212,7 @@ body {
 }
 
 
-/* --- 2. センターエリア & 3. 右エリア --- */
+/* --- センターエリア & 右エリア --- */
 #center_area {
   display: flex;
   flex-direction: column;
@@ -291,7 +291,7 @@ button[onclick="clearbtn()"]:hover {
   align-items: center;
 }
 
-/* 枠とブロックのサイズ一致（230px） */
+/* 枠とブロックのサイズ一致*/
 .blocksnap_area {
   width: 230px;
   height: 80px;

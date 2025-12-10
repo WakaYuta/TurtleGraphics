@@ -5,19 +5,19 @@
     },
     {
         "element": "#block5",
-        "intro": "新しく使えるブロックが増えました。"
+        "intro": "「壁にぶつかったら」ブロックが増えました。"
     },
     {
         "element": "#block6",
-        "intro": "こちらも新しいブロックです。"
+        "intro": "「ここまでIF」ブロックで範囲をきめます。"
     },
     {
-        "intro": "<p>この二つのブロックでほかのブロックを挟むことでカメが壁や障害物にぶつかったときの動作を指定できます。</p><img src='/static/assets/c4_img.png' style='width: 150px; display: block; margin: 8px auto;'>",
+        "intro": "<p>この二つのブロックでほかのブロックを挟むことでカメが壁や障害物にぶつかったときの動作を指定できます。</p><img src='/static/assets/c4_img.png' style='width: 400px; display: block; margin: 8px auto;'><p>↑ カメが障害物に当たると「９０度右に曲がる」を実行</p>",
         "position": "floating"
     },
     {
         "element": "#blockGenerateButton",
-        "intro": "このボタンを押すと、障害物を出すことができます。試しに出してみましょう！"
+        "intro": "このボタンを押すと、障害物を出すことができます。<br>試しに出してみましょう！"
     },
     {
         "element": "#canvas_wrapper",
@@ -25,7 +25,7 @@
     },
     {
         "element": "#block1",
-        "intro": "このブロックは、999歩で変えることができません。"
+        "intro": "このブロックは、「999歩」以外に変えることができません。"
     },
     {
         "element": "#canvas_wrapper",

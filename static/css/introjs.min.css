@@ -147,7 +147,7 @@ tr.introjs-showElement>th {
     visibility: visible;
     background-color: #fff;
     min-width: 250px;
-    max-width: 300px;
+    max-width: 1000px;
     border-radius: 5px;
     box-shadow: 0 3px 30px rgba(33, 33, 33, .3);
     transition: opacity .1s ease-out
