@@ -240,6 +240,9 @@
       turtle.style.position = "absolute";
       turtle.style.left = `${rect.left + window.pageXOffset + currentX - turtleWidth / 2}px`;
       turtle.style.top = `${rect.top + window.pageYOffset + currentY - turtleHeight}px`;
+      //クリック時にカメの向きをリセット
+      a = 0;
+      turtle.style.transform = `rotate(${a}deg)`;
     });
     const obstacles = [];
     let imageCounter = 0;
@@ -476,6 +479,10 @@
           const end_for_index = code_array.findIndex((row, i) => row[0] === "for2" && i > index);
           if (end_for_index !== -1) {
             const repeatCount = parseFloat(blockElement.querySelector("input").value);
+
+            const endBlockElement = code_array[end_for_index][1];
+            endBlockElement.classList.add("block_highlights");
+
             for (let j = 0; j < repeatCount; j++) {
               if (!isRunning) break;
               for (let k = index + 1; k < end_for_index; k++) {
@@ -483,6 +490,7 @@
                 k = await processCode(k);
               }
             }
+            endBlockElement.classList.remove("block_highlights");//ループが終わったらハイライトを消す
             nextIndex = end_for_index; // 繰り返し終端へジャンプ
           } else { alert("繰り返しの終端が必要です。"); }
           break;
