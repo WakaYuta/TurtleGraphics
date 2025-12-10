@@ -85,18 +85,20 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
   <script type="text/javascript">
-    var startx = 350; //初期位置
-    var starty = 350; //初期位置
-    let currentX = startx;
-    let currentY = starty;
-    var x = (y = a = 0);
-    let turtle_speed = 1;
-    const codeAreaSize = 9;
+    var startx = 0; //初期位置
+    var starty = 0; //初期位置
+    let currentX = startx;//現在の位置
+    let currentY = starty;//現在の位置
+    var x = (y = a = 0);//変数初期化
+    let turtle_speed = 1;//速度設定
+    const codeAreaSize = 11;
     let totalBlocks = 0;
+    //実行制御用
     let isRunning = false;
     let animationFrameId = null; // 「歩く」アニメーションの管理番号
     let timeoutId = null;        // 「回転」の待ち時間の管理番号
 
+    // 要素の取得
     const maincanvas = document.querySelector("#mainCanvas");
     const gridcanvas = document.querySelector("#gridCanvas");
     const mainCtx = maincanvas.getContext("2d", { willReadFrequently: true });
@@ -107,7 +109,33 @@
     mainCtx.fillStyle = "rgb(255, 255, 255)"; // キャンバスの背景色（内側の白色） 
     mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
 
+    //ページ読み込み時の処理
     window.addEventListener("DOMContentLoaded", function () {
+      // キャンバスのサイズから中心を計算してstartx,startyに入れる
+      startx = maincanvas.width / 2;
+      starty = maincanvas.height / 2;
+
+      // 現在地も中心にセット
+      currentX = startx;
+      currentY = starty;
+
+      // カメを初期位置にセット
+      const turtle = document.getElementById("turtle");
+
+      function setInitialPosition() {
+        // startx(中心) から カメのサイズの半分 を引いて配置
+        turtle.style.left = `${startx - turtle.offsetWidth / 2}px`;
+        turtle.style.top = `${starty - turtle.offsetHeight}px`;
+      }
+
+      // 画像読み込み完了を確認してセット
+      if (turtle.complete) {
+        setInitialPosition();
+      } else {
+        turtle.onload = setInitialPosition;
+      }
+
+      //URLからstageナンバーを取得
       const urlParams = new URLSearchParams(window.location.search);
       const stage = urlParams.get("stage") || "1";
 
