@@ -29,6 +29,9 @@
           <button class="btn" type="button" id="gridButton" onclick="grid()">
             グリッド
           </button>
+          <button class="btn" type="button" onclick="clearbtn()">
+            クリア
+          </button>
           <button id="btn_check" class="btn btn_check" type="button" onclick="check()">
             チェック
           </button>
@@ -40,8 +43,8 @@
           <button id="btn_start" class="btn btn_action" type="button" onclick="start()">
             スタート
           </button>
-          <button class="btn btn_action" type="button" onclick="clearbtn()">
-            クリア
+          <button id="btn_stop" class="btn btn_action btn_stop_style" type="button" onclick="stopExecution()">
+            ストップ
           </button>
         </div>
         <div id="code_area">
@@ -85,6 +88,9 @@
     let turtle_speed = 1;
     const codeAreaSize = 9;
     let totalBlocks = 0;
+    let isRunning = false;
+    let animationFrameId = null; // 「歩く」アニメーションの管理番号
+    let timeoutId = null;        // 「回転」の待ち時間の管理番号
 
     const maincanvas = document.querySelector("#mainCanvas");
     const gridcanvas = document.querySelector("#gridCanvas");
@@ -351,53 +357,70 @@
       return new Promise((resolve) => {
         let rect = maincanvas.getBoundingClientRect();
         function fd_draw() {
+          if (!isRunning) return; // 停止フラグ確認
+
           mainCtx.strokeStyle = colorPicker.value;
           if (step > 0) {
             const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
             const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
-            // 境界チェック 
+            // 境界チェック
             if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { resolve(); return; }
+
             const screenX = rect.left + window.pageXOffset + nextX;
             const screenY = rect.top + window.pageYOffset + nextY;
             for (const obstacle of obstacles) {
               const bounds = getObstacleBounds(obstacle);
               if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { resolve(); return; }
             }
+
             mainCtx.beginPath(); mainCtx.lineWidth = 10; mainCtx.moveTo(currentX, currentY);
             currentX = nextX; currentY = nextY;
             mainCtx.lineTo(currentX, currentY); mainCtx.stroke();
-            // タートルの位置を更新 
+
+            // タートル位置更新
             const turtle = document.getElementById("turtle");
             const turtleWidth = turtle.offsetWidth; const turtleHeight = turtle.offsetHeight;
             turtle.style.left = `${rect.left + window.pageXOffset + currentX + x - turtleWidth / 2}px`;
             turtle.style.top = `${rect.top + window.pageYOffset + currentY - y - turtleHeight}px`;
+
             step--;
-            // アニメーションが終了したらresolveを呼び出す 
-            if (step === 0) { resolve(); } else { requestAnimationFrame(fd_draw); }
+
+            // アニメーション終了時resolve呼び出し
+            if (step === 0) { resolve(); }
+            else {
+              // ID保存、次フレーム予約（setTimeoutで速度一定化：10ms間隔）
+              timeoutId = setTimeout(fd_draw, 10);
+            }
           } else { resolve(); }
         }
-        fd_draw();
+        // 開始時ID保存
+        timeoutId = setTimeout(fd_draw, 10);
       });
     }
 
-    // 右回転
+    //////////////////
+    ///// 右回転//////
+    //////////////////
     function rt(angle) {
       return new Promise((resolve) => {
         a += angle;
         const turtle = document.getElementById("turtle");
         turtle.style.transform = `rotate(${a}deg)`;
-        // CSSで設定した0.5秒のトランジションを待機
-        setTimeout(resolve, 500);
+        // CSSトランジション(0.5秒)待機
+        timeoutId = setTimeout(resolve, 500);
       });
     }
-    // 左回転
+
+    //////////////////
+    ///// 左回転 //////
+    //////////////////
     function lt(angle) {
       return new Promise((resolve) => {
         a -= angle;
         const turtle = document.getElementById("turtle");
         turtle.style.transform = `rotate(${a}deg)`;
-        // CSSで設定した0.5秒のトランジションを待機
-        setTimeout(resolve, 500);
+        // CSSトランジション(0.5秒)待機
+        timeoutId = setTimeout(resolve, 500);
       });
     }
 
@@ -405,22 +428,45 @@
     /////スタート//////
     //////////////////
     async function start() {
+      if (isRunning) return; // 二重起動防止
+      isRunning = true;
       x = y = a = 0; turtle.style.transform = `rotate(${a}deg)`;
-      for (var i = 0; i < codeAreaSize; i++) { i = await processCode(i); }
+      for (var i = 0; i < codeAreaSize; i++) {
+        if (!isRunning) break; // 停止フラグ確認
+        i = await processCode(i);
+      }
+      isRunning = false;
       document.dispatchEvent(new CustomEvent("paintdone"));
     }
 
+    function stopExecution() {
+      isRunning = false; // 停止合図
+
+      // アニメーションと待機時間をキャンセル
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (timeoutId) clearTimeout(timeoutId);
+
+      // ブロックのハイライトを消す
+      const highlightedBlocks = document.querySelectorAll('.block_highlights');
+      highlightedBlocks.forEach(block => {
+        block.classList.remove('block_highlights');
+      });
+    }
+
     async function processCode(index) {
+      if (!isRunning) return index;
       if (!code_array[index] || code_array[index][0] === 0) return index;
 
       const blockElement = code_array[index][1];
 
-      //ハイライト表示開始
+      // ハイライト開始
       blockElement.classList.add("block_highlights");
+      // ★追加：視認用ウェイト（これがないとハイライトが見えない）
+      await new Promise(resolve => setTimeout(resolve, 50));
 
-      console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`); // デバッグメッセージ
+      console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`);
 
-      let nextIndex = index; // 次に実行するブロックのインデックスを保持します
+      let nextIndex = index; // 次実行ブロックインデックス保持
 
       switch (code_array[index][0]) {
         case "fd": await fd(parseFloat(blockElement.querySelector("input").value)); break;
@@ -431,12 +477,13 @@
           if (end_for_index !== -1) {
             const repeatCount = parseFloat(blockElement.querySelector("input").value);
             for (let j = 0; j < repeatCount; j++) {
-              // ループ内のブロック実行は再帰的に processCode を呼び出します
+              if (!isRunning) break;
               for (let k = index + 1; k < end_for_index; k++) {
+                if (!isRunning) break;
                 k = await processCode(k);
               }
             }
-            nextIndex = end_for_index; // 繰り返しブロックの終端にジャンプします
+            nextIndex = end_for_index; // 繰り返し終端へジャンプ
           } else { alert("繰り返しの終端が必要です。"); }
           break;
         case "if1":
@@ -455,24 +502,24 @@
             }
 
             if (hit) {
-              // IF条件が真の場合、内部のブロックを実行します
+              // IF真の場合、内部ブロック実行
               for (let k = index + 1; k < end_if_index; k++) {
                 k = await processCode(k);
               }
             }
-            nextIndex = end_if_index; // IFブロックの終端にジャンプします
+            nextIndex = end_if_index; // IF終端へジャンプ
           } else { alert("IFの終端が必要です。"); }
           break;
         case "for2":
         case "if2":
-          // 終端ブロックでは特に処理なし
+          // 終端ブロック処理なし
           break;
       }
 
-      // 3. ハイライト表示終了
+      // ハイライト終了
       blockElement.classList.remove("block_highlights");
 
-      return nextIndex; // 次のインデックスに進むか、スキップしたインデックスを返します
+      return nextIndex; // 次インデックス返却
     }
 
     //////////////////////////////////////////////////

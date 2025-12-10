@@ -269,6 +269,16 @@ button[onclick="clearbtn()"]:hover {
   background-color: #FF9E80;
 }
 
+/* ストップボタンの色設定 */
+.btn_stop_style {
+  background-color: #EF5350 !important;
+  color: #fff !important;
+}
+
+.btn_stop_style:hover {
+  background-color: #E53935 !important;
+}
+
 
 /* --- コードエリア --- */
 #code_area {
