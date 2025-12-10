@@ -219,8 +219,8 @@
     const gridSize = 100;
 
     function drawGrid() {
-      // 2. 薄いグリッド線を描く
-      gridCtx.strokeStyle = "rgb(230, 230, 230)"; // 薄めのグレー
+      // 薄いグリッド線を描く
+      gridCtx.strokeStyle = "rgb(230, 230, 230)";
       gridCtx.lineWidth = 1;
 
       for (let i = gridSize; i < Math.max(gridcanvas.width, gridcanvas.height); i += gridSize) {
@@ -232,19 +232,19 @@
         }
       }
 
-      // 3. 右下に「L字型のスケールバー」を描く
+      // 右下にL字型のスケールバーを描く
       const barLength = 100;
 
-      // コーナーの位置を計算（キャンバスの右下隅のグリッドに合わせる）
-      // キャンバス幅(700)ピッタリだと線が切れることがあるので、線の太さ分(1.5px)だけ内側にずらします
+      // コーナーの位置を計算
+      // 線の太さ分(1.5px)だけ内側にずらす
       const cornerX = (Math.floor(gridcanvas.width / gridSize) * gridSize) - 1.5;
       const cornerY = (Math.floor(gridcanvas.height / gridSize) * gridSize) - 1.5;
 
-      // スタート位置（コーナーから100歩戻ったところ）
+      // スタート位置
       const hStartX = cornerX - barLength; // 横棒の左端
       const vStartY = cornerY - barLength; // 縦棒の上端
 
-      gridCtx.strokeStyle = "rgb(100, 100, 100)"; // 少し濃いグレー
+      gridCtx.strokeStyle = "rgb(100, 100, 100)";
       gridCtx.lineWidth = 3; // 太線
       gridCtx.beginPath();
 
@@ -253,11 +253,10 @@
       gridCtx.lineTo(cornerX, cornerY);
 
       // 縦線（上から右下の角へ）
-      // これで「_|」のような形で角がくっつきます
       gridCtx.moveTo(cornerX, vStartY);
       gridCtx.lineTo(cornerX, cornerY);
 
-      // 端っこの「チョン」とした線（目盛り）
+      // 目盛り
       const tickSize = 6;
 
       // 横棒の左端の目盛り
@@ -622,7 +621,7 @@
         const correctShape = getShapeData(correctImage);
 
         if (userShape.pixelCount === 0) {
-          console.log("何も描かれていないようです。");
+          console.log("No drawing detected.");
           showAnswerMark(false);
           return;
         }
@@ -631,9 +630,22 @@
 
         console.log(`類似度スコア: ${similarity.toFixed(3)}`);
 
-        const isCorrect = similarity >= 0.75;
+        //合格ライン（閾値）設定
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentStage = urlParams.get("stage") || "1";
+        let threshold = 0.70; // 基本の合格ライン70%
+        if (currentStage === "4") {
+          threshold = 0.50; // ステージ4だけ50%
+          console.log("aaaaaaaaaa");
+        }
+
+        //類似度と閾値を比較
+        const isCorrect = similarity >= threshold;
+
+        //マークを表示
         showAnswerMark(isCorrect);
 
+        //正解なら次へボタン表示
         if (isCorrect) {
           document.dispatchEvent(new CustomEvent("trianglecorrect"));
           const nextButton = document.getElementById("btn_next");
@@ -643,33 +655,42 @@
         }
 
       } catch (error) {
-        console.error("判定処理中にエラーが発生しました:", error);
+        console.error("error:", error);
         showAnswerMark(false);
       }
     }
 
+    //絵の中から描かれた図形だけを切り抜く（白を背景、色部分を対象）
     function getShapeData(source) {
+      // 作業用キャンバス作成
       const canvas = document.createElement('canvas');
       canvas.width = 700;
       canvas.height = 700;
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+      // 画像を描画
       ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
 
+      // 全ピクセルの色データ取得
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const binaryData = new Uint8Array(canvas.width * canvas.height);
 
       let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1;
       let pixelCount = 0;
 
+      // 全ピクセルを走査
       for (let i = 0; i < imageData.data.length; i += 4) {
         const r = imageData.data[i];
         const g = imageData.data[i + 1];
         const b = imageData.data[i + 2];
         const pixelIndex = i / 4;
 
+        // 色がある部分（白以外）を検出
         if (r < 250 || g < 250 || b < 250) {
           binaryData[pixelIndex] = 1;
           pixelCount++;
+          // 大きさの測定
+          // 描画範囲（外枠）を更新
           const x = pixelIndex % canvas.width;
           const y = Math.floor(pixelIndex / canvas.width);
           minX = Math.min(minX, x);
@@ -681,8 +702,10 @@
         }
       }
 
+      // 図形が存在するか判定
       const boundingBox = (pixelCount > 20) ? { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 } : null;
 
+      // 解析結果（データと位置情報）を返す
       return {
         binaryData: binaryData,
         width: canvas.width,
@@ -692,12 +715,16 @@
       };
     }
 
+    //2つの図形を重ねて類似度を採点
     function compareShapes(shapeA, shapeB) {
+      // 描画有無の確認
       if (!shapeA.boundingBox || !shapeB.boundingBox) return 0;
 
+      // 比較用の最大サイズ決定
       const comparisonWidth = Math.max(shapeA.boundingBox.width, shapeB.boundingBox.width);
       const comparisonHeight = Math.max(shapeA.boundingBox.height, shapeB.boundingBox.height);
 
+      // 比較用キャンバス作成（A・B用）
       const canvasA = document.createElement('canvas');
       canvasA.width = comparisonWidth;
       canvasA.height = comparisonHeight;
@@ -711,6 +738,7 @@
       const tempImgDataA = ctxA.createImageData(shapeA.boundingBox.width, shapeA.boundingBox.height);
       const tempImgDataB = ctxB.createImageData(shapeB.boundingBox.width, shapeB.boundingBox.height);
 
+      // 図形Aを切り出して中央配置
       for (let y = 0; y < shapeA.boundingBox.height; y++) {
         for (let x = 0; x < shapeA.boundingBox.width; x++) {
           const index = y * shapeA.boundingBox.width + x;
@@ -720,8 +748,10 @@
           }
         }
       }
+      // 図形Aを中央に配置
       ctxA.putImageData(tempImgDataA, (comparisonWidth - shapeA.boundingBox.width) / 2, (comparisonHeight - shapeA.boundingBox.height) / 2);
 
+      // 図形Bを切り出して中央配置
       for (let y = 0; y < shapeB.boundingBox.height; y++) {
         for (let x = 0; x < shapeB.boundingBox.width; x++) {
           const index = y * shapeB.boundingBox.width + x;
@@ -731,26 +761,30 @@
           }
         }
       }
+      // 図形Bを中央に配置
       ctxB.putImageData(tempImgDataB, (comparisonWidth - shapeB.boundingBox.width) / 2, (comparisonHeight - shapeB.boundingBox.height) / 2);
 
+      // 比較用画像データ取得
       const dataA = ctxA.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
       const dataB = ctxB.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
 
-      let intersection = 0;
-      let union = 0;
+      let intersection = 0; // 重なり部分
+      let union = 0;        // 全体の広さ
 
+      // ピクセルごとの一致判定
       for (let i = 0; i < dataA.length; i += 4) {
         const pixelA = dataA[i + 3] > 0;
         const pixelB = dataB[i + 3] > 0;
 
         if (pixelA && pixelB) {
-          intersection++;
+          intersection++;   // 両方ある（重なり）
         }
         if (pixelA || pixelB) {
-          union++;
+          union++;          // どちらかある（全体）
         }
       }
 
+      // 一致率を返す
       return union > 0 ? intersection / union : 0;
     }
 
