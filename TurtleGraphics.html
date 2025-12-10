@@ -25,6 +25,10 @@
             <label class="color-picker-label" for="colorPicker">ペンの色</label>
             <input class="color-picker" type="color" id="colorPicker" value="#000000" />
           </div>
+          <div class="speed-control-container">
+            <label class="speed-control-label" for="speedSlider">スピード</label>
+            <input type="range" id="speedSlider" min="1" max="10" value="1" class="speed-slider" />
+          </div>
           <div id="generate_button_container"></div>
           <button class="btn" type="button" id="gridButton" onclick="grid()">
             グリッド
@@ -211,6 +215,17 @@
           intro.start();
         })
         .catch(error => console.error('Error:', error));
+
+      //スピードスライダーのイベント設定
+      const speedSlider = document.getElementById("speedSlider");
+      // 初期値を反映
+      turtle_speed = parseInt(speedSlider.value);
+
+      // スライダーを動かした時に値を更新
+      speedSlider.addEventListener("input", function () {
+        turtle_speed = parseInt(this.value);
+        // 数値が大きいほど速くなる（1歩あたりの距離が増える）
+      });
     });
 
     //////////////////
@@ -427,16 +442,27 @@
     //////////////////
     ///// 前進 //////
     //////////////////
-    function fd(step) {
+    function fd(inputDistance) {
       return new Promise((resolve) => {
         let rect = maincanvas.getBoundingClientRect();
+
+        // 残りの距離を管理する変数
+        let remainingDistance = inputDistance;
+
         function fd_draw() {
-          if (!isRunning) return; // 停止フラグ確認
+          if (!isRunning) return; // 停止チェック
 
           mainCtx.strokeStyle = colorPicker.value;
-          if (step > 0) {
-            const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
-            const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
+
+          // 残り距離がある間はループ
+          if (remainingDistance > 0) {
+
+            // 今回進む距離を決める
+            let moveStep = (remainingDistance < turtle_speed) ? remainingDistance : turtle_speed;
+
+            const nextX = currentX + moveStep * Math.sin((a * Math.PI) / 180.0);
+            const nextY = currentY - moveStep * Math.cos((a * Math.PI) / 180.0);
+
             // 境界チェック
             if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { resolve(); return; }
 
@@ -451,23 +477,21 @@
             currentX = nextX; currentY = nextY;
             mainCtx.lineTo(currentX, currentY); mainCtx.stroke();
 
-            // タートル位置更新
             const turtle = document.getElementById("turtle");
             const turtleWidth = turtle.offsetWidth; const turtleHeight = turtle.offsetHeight;
             turtle.style.left = `${rect.left + window.pageXOffset + currentX + x - turtleWidth / 2}px`;
             turtle.style.top = `${rect.top + window.pageYOffset + currentY - y - turtleHeight}px`;
 
-            step--;
+            // 進んだ分だけ残り距離を減らす
+            remainingDistance -= moveStep;
 
-            // アニメーション終了時resolve呼び出し
-            if (step === 0) { resolve(); }
+            if (remainingDistance <= 0) { resolve(); }
             else {
-              // ID保存、次フレーム予約（setTimeoutで速度一定化：10ms間隔）
               timeoutId = setTimeout(fd_draw, 10);
             }
           } else { resolve(); }
         }
-        // 開始時ID保存
+
         timeoutId = setTimeout(fd_draw, 10);
       });
     }
@@ -535,7 +559,6 @@
 
       // ハイライト開始
       blockElement.classList.add("block_highlights");
-      // ★追加：視認用ウェイト（これがないとハイライトが見えない）
       await new Promise(resolve => setTimeout(resolve, 50));
 
       console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`);
@@ -563,7 +586,7 @@
             }
             endBlockElement.classList.remove("block_highlights");//ループが終わったらハイライトを消す
             nextIndex = end_for_index; // 繰り返し終端へジャンプ
-          } else { alert("繰り返しの終端が必要です。"); }
+          } else { alert("「ここまで繰り返し」が必要です！"); }
           break;
         case "if1":
           const end_if_index = code_array.findIndex((row, i) => row[0] === "if2" && i > index);
@@ -581,13 +604,18 @@
             }
 
             if (hit) {
+              //終端ブロックもハイライト
+              const endBlockElement = code_array[end_if_index][1];
+              endBlockElement.classList.add("block_highlights");
               // IF真の場合、内部ブロック実行
               for (let k = index + 1; k < end_if_index; k++) {
                 k = await processCode(k);
               }
+              //処理が終わったらハイライトを消す
+              endBlockElement.classList.remove("block_highlights");
             }
             nextIndex = end_if_index; // IF終端へジャンプ
-          } else { alert("IFの終端が必要です。"); }
+          } else { alert("「ここまでIF」が必要です！"); }
           break;
         case "for2":
         case "if2":

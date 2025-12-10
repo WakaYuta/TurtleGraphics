@@ -129,10 +129,6 @@ body {
   font-size: 16px;
 }
 
-.color-picker-label {
-  margin-right: 10px;
-}
-
 .color-picker {
   -webkit-appearance: none;
   appearance: none;
@@ -157,6 +153,56 @@ body {
   border-radius: 50%;
 }
 
+/* --- スピード調整スライダー--- */
+.speed-control-container {
+  display: flex;
+  align-items: center;
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.speed-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 120px;
+  /* スライダーの幅 */
+  height: 20px;
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 10px;
+  outline: none;
+  box-shadow: 2px 2px 0px #000;
+  cursor: pointer;
+}
+
+/* つまみのデザイン - Chrome/Safari/Edge用 */
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: #FF6E40;
+  border: 3px solid #000;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 1px 1px 0px #000;
+  transition: transform 0.1s;
+}
+
+.speed-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* つまみのデザイン - Firefox用 */
+.speed-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: #FF6E40;
+  border: 3px solid #000;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 1px 1px 0px #000;
+}
 
 /* ========== ボタン共通設定 ========== */
 .btn {
@@ -183,7 +229,8 @@ body {
 
 .btn_check {
   background-color: #40C4FF;
-  width: 180px;
+  width: 120px;
+  height: 55px;
 }
 
 .btn_check:hover {
@@ -385,12 +432,26 @@ button[onclick="clearbtn()"]:hover {
 }
 
 .block_highlights {
-  background: #FFEA00 !important;
+  background: #FFF59D !important;
   color: #000 !important;
   border: 3px solid #000 !important;
-  box-shadow: 0 0 0 4px #FFEA00 !important;
+  box-shadow: 0 0 0 4px #FFF59D !important;
   transform: scale(1.05);
   z-index: 20;
+}
+
+/* 繰り返しブロックのハイライト*/
+.block[data-type="for1"].block_highlights,
+.block[data-type="for2"].block_highlights {
+  background: #B9F6CA !important;
+  box-shadow: 0 0 0 4px #B9F6CA !important;
+}
+
+/* 壁にぶつかったらのハイライト*/
+.block[data-type="if1"].block_highlights,
+.block[data-type="if2"].block_highlights {
+  background: #EA80FC !important;
+  box-shadow: 0 0 0 4px #EA80FC !important;
 }
 
 .block_numbox {
