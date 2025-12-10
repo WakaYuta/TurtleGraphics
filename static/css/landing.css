@@ -1,0 +1,138 @@
+@import url("https://fonts.googleapis.com/css?family=Kosugi+Maru");
+@import url("https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:700&display=swap");
+
+body {
+    margin: 0;
+    font-family: "M PLUS Rounded 1c", "Kosugi Maru", sans-serif;
+    /* 本体とお揃いの背景 */
+    background-color: #FFF8E1;
+    color: #000000;
+    background-image: radial-gradient(#000000 10%, transparent 10%);
+    background-size: 24px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* 中央のカード */
+.container {
+    background-color: #ffffff;
+    padding: 50px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+
+    /* 黒枠とくっきり影 */
+    border: 3px solid #000;
+    box-shadow: 10px 10px 0px #000;
+}
+
+/* カメのアイコン */
+.turtle-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+    /* カメにも少し影を */
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 1));
+    transition: transform 0.3s ease;
+}
+
+.container:hover .turtle-icon {
+    transform: rotate(10deg) scale(1.1);
+}
+
+/* タイトル */
+h1 {
+    font-size: 32px;
+    font-weight: 900;
+    color: #000;
+    margin: 0 0 15px 0;
+    /* 文字の縁取り風シャドウ */
+    text-shadow: 2px 2px 0px #FFD54F;
+}
+
+/* 説明文 */
+p {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 40px;
+    line-height: 1.8;
+    font-weight: 700;
+}
+
+/* ステージ選択のラベル */
+label {
+    display: block;
+    font-weight: 900;
+    margin-bottom: 10px;
+    color: #000;
+    font-size: 18px;
+    text-align: left;
+}
+
+/* プルダウンメニュー */
+select {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    color: #000;
+    background-color: #fff;
+
+    /* ネオ・ブルータリズムスタイル */
+    border: 3px solid #000;
+    border-radius: 8px;
+    box-shadow: 4px 4px 0px #000;
+    cursor: pointer;
+    appearance: none;
+    /* デフォルトの矢印を消す */
+
+    /* オリジナルの矢印（SVG） */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%208l5%205%205-5z%22%20fill%3D%22%23000%22/%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 20px;
+    transition: all 0.1s;
+}
+
+select:focus {
+    outline: none;
+    background-color: #FAFAFA;
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
+}
+
+/* スタートボタン */
+button {
+    width: 100%;
+    padding: 18px;
+    margin-top: 40px;
+    font-size: 20px;
+    font-family: inherit;
+    font-weight: 900;
+    color: #000;
+
+    /* ポップな緑色 */
+    background-color: #69F0AE;
+    border: 3px solid #000;
+    border-radius: 10px;
+    cursor: pointer;
+
+    box-shadow: 6px 6px 0px #000;
+    transition: all 0.1s;
+    transform: translate(0, 0);
+}
+
+button:hover {
+    background-color: #00E676;
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px #000;
+}
+
+button:active {
+    transform: translate(6px, 6px);
+    /* 影の位置まで沈む */
+    box-shadow: 0px 0px 0px #000;
+}

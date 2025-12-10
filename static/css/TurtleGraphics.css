@@ -1,9 +1,6 @@
 @import url("https://fonts.googleapis.com/css?family=Kosugi+Maru");
 @import url("https://fonts.googleapis.com/css?family=M+PLUS+Rounded+1c:700&display=swap");
 
-/* --- 出典・参考スタイル：ネオ・ブルータリズム（Neo-Brutalism） --- */
-/* 動作安定版：おもちゃ箱テーマのレイアウトロジック ＋ ネオ・ブルータリズムのデザイン */
-
 * {
   box-sizing: border-box;
 }
