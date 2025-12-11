@@ -12,7 +12,7 @@
         "intro": "ここまで繰り返すブロックです。"
     },
     {
-        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。</p><img src='/static/assets/c3_gif.gif' style='width: 200px; display: block; margin: 8px auto;'>",
+        "intro": "<p>この2つのブロックではさむことで、間にあるブロックを決めた回数だけ繰り返すことができます。</p><img src='static/assets/c3_gif.gif' style='width: 200px; display: block; margin: 8px auto;'>",
         "position": "floating"
     },
     {
@@ -21,7 +21,7 @@
     },
     {
         "element": "#page",
-        "intro": "<p>OK!繰り返しを使うことで、同じ結果でもブロックの数を少なくすることができます！</p><img src='/static/assets/c3_img.png' style='width: 400px; display: block; margin: 8px auto;'><p>↑ 繰り返しを使うほうが短くてきれい！</p>",
+        "intro": "<p>OK!繰り返しを使うことで、同じ結果でもブロックの数を少なくすることができます！</p><img src='static/assets/c3_img.png' style='width: 400px; display: block; margin: 8px auto;'><p>↑ 繰り返しを使うほうが短くてきれい！</p>",
         "position": "floating"
     },
     {

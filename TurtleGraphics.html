@@ -85,21 +85,21 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
   <script type="text/javascript">
-    var startx = 0; //初期位置
-    var starty = 0; //初期位置
-    let currentX = startx;//現在の位置
-    let currentY = starty;//現在の位置
-    var x = (y = a = 0);//変数初期化
-    let turtle_speed = 1;//速度設定
-    const codeAreaSize = 11;
-    let totalBlocks = 0;
-    //実行制御用
-    let isRunning = false;
-    let animationFrameId = null; // 「歩く」アニメーションの管理番号
-    let timeoutId = null;        // 「回転」の待ち時間の管理番号
-    let collisionDetected = false; //衝突フラグ
+    // 変数定義
+    var startx = 0;
+    var starty = 0;
+    let currentX = 0;
+    let currentY = 0;
+    var x = 0, y = 0, a = 0;
 
-    // 要素の取得
+    // 設定・制御用
+    let turtle_speed = 1;
+    let isRunning = false;
+    let animationFrameId = null;
+    let timeoutId = null;
+    let collisionDetected = false;
+
+    // 要素取得
     const maincanvas = document.querySelector("#mainCanvas");
     const gridcanvas = document.querySelector("#gridCanvas");
     const mainCtx = maincanvas.getContext("2d", { willReadFrequently: true });
@@ -107,8 +107,19 @@
     const colorPicker = document.getElementById("colorPicker");
     let lineColor = "rgb(0, 0, 0)";
 
-    mainCtx.fillStyle = "rgb(255, 255, 255)"; // キャンバスの背景色（内側の白色） 
+    // キャンバス初期化
+    mainCtx.fillStyle = "rgb(255, 255, 255)";
     mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
+
+    // 障害物管理
+    const obstacles = [];
+    let imageCounter = 0;
+
+    // 配列定義
+    const codeAreaSize = 9;
+    let code_array = [];
+    let totalBlocks = 0;
+
 
     //ページ読み込み時の処理
     window.addEventListener("DOMContentLoaded", function () {
@@ -136,18 +147,21 @@
         turtle.onload = setInitialPosition;
       }
 
+      // グリッド描画
+      drawGrid();
+
       //URLからstageナンバーを取得
       const urlParams = new URLSearchParams(window.location.search);
       const stage = urlParams.get("stage") || "1";
 
+      // ステージデータを読み込んでブロックを作る
       fetch('stage_data.json')
         .then(response => {
-          if (!response.ok) {
-            throw new Error("stage_data.jsonの読み込みに失敗しました。");
-          }
+          if (!response.ok) { throw new Error("stage_data.jsonの読み込みに失敗しました。"); }
           return response.json();
         })
         .then(stageData => {
+          // ブロック生成処理
           const stageInfo = stageData[stage];
           if (!stageInfo) {
             alert('無効なステージです。メニューに戻ります。');
@@ -214,56 +228,177 @@
           document.getElementById('generate_button_container').innerHTML = generate_html;
 
           const blockArea = document.getElementById('block_area');
-          const initialHeight = blockArea.offsetHeight; // 最初の高さを記憶
-          blockArea.style.height = `${initialHeight}px`; // 高さを固定する
 
           $(".block").draggable({
             start: function () { $(this).addClass("block_drag").removeClass("block_snap"); },
             stop: function () { $(this).removeClass("block_drag"); },
           });
-        })
-        .catch(error => console.error('Error:', error));
 
-      fetch(`static/json/tutorials_stage${stage}.json`)
+          //ブロック生成が終わったのでチュートリアルを読み込み
+          return fetch(`static/json/tutorials_stage${stage}.json`);
+        })
         .then((res) => {
-          if (!res.ok) {
-            throw new Error("チュートリアルファイルの読み込みに失敗しました。");
-          }
+          if (!res.ok) { throw new Error("チュートリアルファイルの読み込みに失敗しました。"); }
           return res.json();
         })
         .then((steps) => {
+          // チュートリアル開始
+          intro = introJs();
           intro.setOptions({
-            showProgress: false,
-            disableInteraction: true,
-            exitOnEsc: false,
-            exitOnOverlayClick: false,
-            nextLabel: "次へ",
-            prevLabel: "戻る",
-            doneLabel: "完了",
-            steps: steps,
+            showProgress: false, disableInteraction: true, exitOnEsc: false, exitOnOverlayClick: false,
+            nextLabel: "次へ", prevLabel: "戻る", doneLabel: "完了", steps: steps,
           });
+          setupIntroListeners(intro, stage);
           intro.start();
         })
         .catch(error => console.error('Error:', error));
 
       //スピードスライダーのイベント設定
       const speedSlider = document.getElementById("speedSlider");
-      // 初期値を反映
-      turtle_speed = parseInt(speedSlider.value);
-
-      // スライダーを動かした時に値を更新
-      speedSlider.addEventListener("input", function () {
-        turtle_speed = parseInt(this.value);
-        // 数値が大きいほど速くなる
-      });
+      if (speedSlider) {
+        // 初期値を反映
+        turtle_speed = parseInt(speedSlider.value);
+        // スライダーを動かした時に値を更新
+        speedSlider.addEventListener("input", function () {
+          turtle_speed = parseInt(this.value);
+          // 数値が大きいほど速くなる
+        });
+      }
     });
 
-    //////////////////
-    ///グリッド描画////
-    //////////////////
-    const gridSize = 100;
 
+    // チュートリアルのイベントリスナー設定
+    function setupIntroListeners(intro, stage) {
+      let turtlePositionSet = false;
+      let blockSet = false;
+      let numSet = false;
+      let paintdone = false;
+      let chekdone = false;
+      let trianglecorrect1 = false;
+      let trianglecorrect2 = false;
+      let trianglecorrect3 = false;
+      let obstacleSet = false;
+
+      intro.onafterchange(function (targetElement) {
+        const currentStep = intro._currentStep;
+        if (stage === '1') {
+          //ユーザーがキャンバスをクリックするのを待つ
+          if (currentStep === 3 && !turtlePositionSet) {
+            intro.exit();
+            const canvas = document.getElementById("canvas_wrapper");
+            const handler = () => {
+              turtlePositionSet = true;
+              canvas.removeEventListener("click", handler);
+              intro.goToStep(4);
+            };
+            canvas.addEventListener("click", handler);
+          }
+          //ユーザーがブロックを配置するのを待つ
+          if (currentStep === 5 && !blockSet) {
+            intro.exit();
+            document.addEventListener('codeArrayChanged', function checkFdBlock() {
+              if (code_array[0][0] === "fd") {
+                blockSet = true;
+                document.removeEventListener('codeArrayChanged', checkFdBlock);
+                intro.goToStep(6);
+              }
+            });
+          }
+          //数値入力を待つ
+          if (currentStep === 6 && !numSet) {
+            intro.exit();
+            const setupInputListener = () => {
+              const numberInput = document.getElementById("number1");
+              if (numberInput) {
+                const inputHandler = function () {
+                  if (this.value === "300") {
+                    numSet = true;
+                    this.removeEventListener("input", inputHandler);
+                    document.removeEventListener('codeArrayChanged', setupInputListener);
+                    intro.goToStep(7);
+                  }
+                };
+                numberInput.addEventListener("input", inputHandler);
+                return true;
+              }
+              return false;
+            };
+            const success = setupInputListener();
+            if (!success) { document.addEventListener('codeArrayChanged', setupInputListener, { once: true }); }
+          }
+          //ユーザーが描画完了するのを待つ
+          if (currentStep === 7 && !paintdone) {
+            intro.exit();
+            document.addEventListener('paintdone', function checkpaintdone() {
+              paintdone = true;
+              document.removeEventListener('paintdone', checkpaintdone);
+              intro.goToStep(8);
+            }, { once: true });
+          }
+          //ユーザーのチェック完了を待つ
+          if (currentStep === 8 && !chekdone) {
+            intro.exit();
+            const checkbtn = document.getElementById("btn_check");
+            const handler = () => {
+              chekdone = true;
+              checkbtn.removeEventListener("click", handler);
+              intro.goToStep(9);
+            };
+            checkbtn.addEventListener("click", handler, { once: true });
+          }
+        }
+        else if (stage === '2') {
+          if (currentStep === 5 && !trianglecorrect1) {
+            intro.exit();
+            //ユーザーが三角形を描画するのを待つ
+            document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+              trianglecorrect1 = true;
+              document.removeEventListener('trianglecorrect', checktrianglecorrect);
+              intro.goToStep(6);
+            }, { once: true });
+          }
+        }
+        else if (stage === '3') {
+          if (currentStep === 5 && !trianglecorrect2) {
+            intro.exit();
+            //ユーザーが三角形を描画するのを待つ
+            document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+              trianglecorrect2 = true;
+              document.removeEventListener('trianglecorrect', checktrianglecorrect);
+              intro.goToStep(6);
+            }, { once: true });
+          }
+        }
+        else if (stage === '4') {
+          if (currentStep === 5 && !obstacleSet) {
+            intro.exit();
+            // ユーザーが障害物を生成するのを待つ
+            const generatebutton = document.getElementById("blockGenerateButton");
+            const handler = () => {
+              obstacleSet = true;
+              generatebutton.removeEventListener("click", handler);
+              intro.goToStep(6);
+            };
+            generatebutton.addEventListener("click", handler);
+          }
+          if (currentStep === 9 && !trianglecorrect3) {
+            intro.exit();
+            //ユーザーが三角形を描画するのを待つ
+            document.addEventListener('trianglecorrect', function checktrianglecorrect() {
+              trianglecorrect3 = true;
+              document.removeEventListener('trianglecorrect', checktrianglecorrect);
+              intro.goToStep(10).start();
+            }, { once: true });
+          }
+        }
+      });
+    }
+
+
+    // グリッド描画
+    const gridSize = 100;
     function drawGrid() {
+      gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height);
       // 薄いグリッド線を描く
       gridCtx.strokeStyle = "rgb(230, 230, 230)";
       gridCtx.lineWidth = 1;
@@ -280,99 +415,49 @@
       // 右下にL字型のスケールバーを描く
       const barLength = 100;
 
-      // コーナーの位置を計算
-      // 線の太さ分(1.5px)だけ内側にずらす
-      const cornerX = (Math.floor(gridcanvas.width / gridSize) * gridSize) - 1.5;
-      const cornerY = (Math.floor(gridcanvas.height / gridSize) * gridSize) - 1.5;
+      const cornerX = Math.floor(gridcanvas.width / gridSize) * gridSize;
+      const cornerY = Math.floor(gridcanvas.height / gridSize) * gridSize;
 
-      // スタート位置
-      const hStartX = cornerX - barLength; // 横棒の左端
-      const vStartY = cornerY - barLength; // 縦棒の上端
+      const hStartX = cornerX - barLength;
+      const vStartY = cornerY - barLength;
 
       gridCtx.strokeStyle = "rgb(100, 100, 100)";
-      gridCtx.lineWidth = 3; // 太線
+      gridCtx.lineWidth = 3;
       gridCtx.beginPath();
 
-      // 横線（左から右下の角へ）
-      gridCtx.moveTo(hStartX, cornerY);
-      gridCtx.lineTo(cornerX, cornerY);
+      gridCtx.moveTo(hStartX, cornerY); gridCtx.lineTo(cornerX, cornerY);
+      gridCtx.moveTo(cornerX, vStartY); gridCtx.lineTo(cornerX, cornerY);
 
-      // 縦線（上から右下の角へ）
-      gridCtx.moveTo(cornerX, vStartY);
-      gridCtx.lineTo(cornerX, cornerY);
-
-      // 目盛り
       const tickSize = 6;
-
-      // 横棒の左端の目盛り
-      gridCtx.moveTo(hStartX, cornerY - tickSize);
-      gridCtx.lineTo(hStartX, cornerY + tickSize);
-
-      // 縦棒の上端の目盛り
-      gridCtx.moveTo(cornerX - tickSize, vStartY);
-      gridCtx.lineTo(cornerX + tickSize, vStartY);
+      gridCtx.moveTo(hStartX, cornerY - tickSize); gridCtx.lineTo(hStartX, cornerY + tickSize);
+      gridCtx.moveTo(cornerX - tickSize, vStartY); gridCtx.lineTo(cornerX + tickSize, vStartY);
 
       gridCtx.stroke();
 
-      // 文字を描く
       gridCtx.fillStyle = "rgb(100, 100, 100)";
       gridCtx.font = "bold 14px sans-serif";
 
-      // 横の「100歩」
-      gridCtx.textAlign = "center";
-      gridCtx.textBaseline = "bottom";
+      gridCtx.textAlign = "center"; gridCtx.textBaseline = "bottom";
       gridCtx.fillText("100歩", hStartX + (barLength / 2), cornerY - 8);
 
-      // 縦の「100歩」
-      gridCtx.textAlign = "right";
-      gridCtx.textBaseline = "middle";
+      gridCtx.textAlign = "right"; gridCtx.textBaseline = "middle";
       gridCtx.fillText("100歩", cornerX - 10, vStartY + (barLength / 2));
     }
-    drawGrid();
+
+    // グリッドON/OFF
     let flag = true;
     function grid() {
-      if (flag) {
-        gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height);
-        flag = false;
-      }
-      else {
-        drawGrid();
-        flag = true;
-      }
+      if (flag) { gridCtx.clearRect(0, 0, gridcanvas.width, gridcanvas.height); flag = false; }
+      else { drawGrid(); flag = true; }
     }
 
-    //////////////////
-    //クリックイベント//
-    //////////////////
-    mainCtx.strokeStyle = lineColor;
-    // イベントリスナーを追加して色の変更を検知する
-    colorPicker.addEventListener("input", function () { lineColor = colorPicker.value; mainCtx.strokeStyle = lineColor; });
-    maincanvas.addEventListener("click", (e) => {
-      let rect = e.target.getBoundingClientRect();
-      const viewX = e.clientX - rect.left, viewY = e.clientY - rect.top;
-      const scaleWidth = maincanvas.clientWidth / maincanvas.width, scaleHeight = maincanvas.clientHeight / maincanvas.height;
-      currentX = Math.floor(viewX / scaleWidth);
-      currentY = Math.floor(viewY / scaleHeight);
+    // クリア
+    function clearbtn() {
+      mainCtx.fillStyle = "rgb(255, 255, 255)";
+      mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
+    }
 
-      const turtle = document.getElementById("turtle");
-      const turtleWidth = turtle.offsetWidth;
-      const turtleHeight = turtle.offsetHeight;
-
-      turtle.style.position = "absolute";
-      turtle.style.left = `${currentX - turtleWidth / 2}px`;
-      turtle.style.top = `${currentY - turtleHeight}px`;
-
-      // クリック時にカメの向きをリセット
-      a = 0;
-      turtle.style.transform = `rotate(${a}deg)`;
-    });
-
-    //////////////////
-    ////障害物生成/////
-    //////////////////
-    const obstacles = [];
-    let imageCounter = 0;
-
+    // 障害物生成
     function block_Generate() {
       const canvasWrapper = document.getElementById("canvas_wrapper");
       const img = document.createElement("img");
@@ -390,10 +475,34 @@
       obstacles.push(img);
       $(img).draggable({ containment: "#canvas_wrapper" });
     }
+    function getObstacleBounds(obstacle) {
+      const rect = obstacle.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
+    }
 
-    //////////////////
-    //ドラッグ処理開始//
-    //////////////////
+    // ペン色変更
+    colorPicker.addEventListener("input", function () { lineColor = colorPicker.value; mainCtx.strokeStyle = lineColor; });
+
+    // クリックでカメ移動
+    maincanvas.addEventListener("click", (e) => {
+      let rect = e.target.getBoundingClientRect();
+      const viewX = e.clientX - rect.left, viewY = e.clientY - rect.top;
+      const scaleWidth = maincanvas.clientWidth / maincanvas.width, scaleHeight = maincanvas.clientHeight / maincanvas.height;
+      currentX = Math.floor(viewX / scaleWidth);
+      currentY = Math.floor(viewY / scaleHeight);
+      const turtle = document.getElementById("turtle");
+      const turtleWidth = turtle.offsetWidth;
+      const turtleHeight = turtle.offsetHeight;
+
+      turtle.style.position = "absolute";
+      turtle.style.left = `${currentX - turtleWidth / 2}px`;
+      turtle.style.top = `${currentY - turtleHeight}px`;
+
+      a = 0;
+      turtle.style.transform = `rotate(${a}deg)`;
+    });
+
+    // ドラッグ＆ドロップ設定
     $(function () {
       $('body').on('mousedown', '.block', function () {
         $(this).draggable({
@@ -410,21 +519,15 @@
           }
         });
       });
-
       $(".blocksnap_area").droppable({
-        accept: ".block",
-        hoverClass: "block_hover",
+        accept: ".block", hoverClass: "block_hover",
         drop: function (event, ui) {
           const droppedBlock = ui.draggable;
-
           droppedBlock.data('dropped_successfully', true);
-
           $(this).children('.block').appendTo('#block_area').removeClass('block_snap').css({ top: 0, left: 0 });
-
           droppedBlock.appendTo(this).addClass("block_snap").css({ top: 0, left: 0 });
         }
       });
-
       $("#block_area").droppable({
         accept: ".block",
         drop: function (event, ui) {
@@ -434,38 +537,19 @@
       });
     });
 
-    //////////////////
-    // 配列を作る ////
-    //////////////////
+    // 配列作成
     function create_array() {
-      // 配列を一度リセット
       code_array = Array(codeAreaSize).fill(0).map(() => Array(2).fill(0));
-
       $('#code_area .blocksnap_area').each(function (index) {
-
         const blockElement = $(this).find('.block').get(0);
-
         if (blockElement) {
           code_array[index][0] = blockElement.dataset.type;
           code_array[index][1] = blockElement;
         }
       });
-
-      console.log("配列=", code_array);
       document.dispatchEvent(new CustomEvent("codeArrayChanged"));
     }
 
-    //////////////////
-    ///// クリア //////
-    //////////////////
-    function clearbtn() {
-      mainCtx.fillStyle = "rgb(255, 255, 255)";
-      mainCtx.fillRect(0, 0, maincanvas.width, maincanvas.height);
-    }
-    function getObstacleBounds(obstacle) {
-      const rect = obstacle.getBoundingClientRect();
-      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom };
-    }
 
     //////////////////
     ///// 前進 //////
@@ -473,23 +557,17 @@
     function fd(inputDistance) {
       return new Promise((resolve) => {
         let rect = maincanvas.getBoundingClientRect();
-
-        // 残りの距離を管理する変数
         let remainingDistance = inputDistance;
-        //衝突フラグリセット
+
+        // 移動開始時に衝突フラグをリセット
         collisionDetected = false;
 
         function fd_draw() {
-          if (!isRunning) return; // 停止チェック
+          if (!isRunning) return; // 停止フラグ確認
 
           mainCtx.strokeStyle = colorPicker.value;
-
-          // 残り距離がある間はループ
           if (remainingDistance > 0) {
-
-            // 今回進む距離を決める
             let moveStep = (remainingDistance < turtle_speed) ? remainingDistance : turtle_speed;
-
             const nextX = currentX + moveStep * Math.sin((a * Math.PI) / 180.0);
             const nextY = currentY - moveStep * Math.cos((a * Math.PI) / 180.0);
 
@@ -504,34 +582,31 @@
                 if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { hitWall = true; break; }
               }
             }
-
-            if (hitWall) {
-              // ぶつかったらフラグを立てて終了
-              collisionDetected = true;
-              resolve();
-              return;
-            }
+            // ぶつかったらフラグを立てて終了
+            if (hitWall) { collisionDetected = true; resolve(); return; }
 
             mainCtx.beginPath(); mainCtx.lineWidth = 10; mainCtx.moveTo(currentX, currentY);
             currentX = nextX; currentY = nextY;
             mainCtx.lineTo(currentX, currentY); mainCtx.stroke();
 
+            // タートル位置更新
             const turtle = document.getElementById("turtle");
             const turtleWidth = turtle.offsetWidth; const turtleHeight = turtle.offsetHeight;
+            // キャンバス内座標で配置
+            turtle.style.left = `${currentX - turtleWidth / 2}px`;
+            turtle.style.top = `${currentY - turtleHeight}px`;
 
-            turtle.style.left = `${currentX + x - turtleWidth / 2}px`;
-            turtle.style.top = `${currentY - y - turtleHeight}px`;
-
-            // 進んだ分だけ残り距離を減らす
             remainingDistance -= moveStep;
 
+            // アニメーション終了時resolve
             if (remainingDistance <= 0) { resolve(); }
             else {
+              // ID保存、次フレーム予約（setTimeoutで速度一定化：10ms間隔）
               timeoutId = setTimeout(fd_draw, 10);
             }
           } else { resolve(); }
         }
-
+        // 開始時ID保存
         timeoutId = setTimeout(fd_draw, 10);
       });
     }
@@ -597,12 +672,12 @@
       if (!code_array[index] || code_array[index][0] === 0) return index;
 
       const blockElement = code_array[index][1];
-      const blockType = code_array[index][0]; // ブロックの種類
+      const blockType = code_array[index][0];
 
+      // 壁に激突していた場合のチェック
       if (collisionDetected) {
-        // 次のブロックが「壁にぶつかったら(if1)」じゃなかったら終了
         if (blockType !== "if1") {
-          stopExecution(); // 停止
+          stopExecution();
           return index;
         }
       }
@@ -611,11 +686,11 @@
       blockElement.classList.add("block_highlights");
       await new Promise(resolve => setTimeout(resolve, 50));
 
-      console.log(`実行中のブロック：${code_array[index][0]} at index ${index}`);
+      console.log(`実行中のブロック：${blockType} at index ${index}`);
 
       let nextIndex = index; // 次実行ブロックインデックス保持
 
-      switch (code_array[index][0]) {
+      switch (blockType) {
         case "fd": await fd(parseFloat(blockElement.querySelector("input").value)); break;
         case "rt": await rt(parseFloat(blockElement.querySelector("input").value)); break;
         case "lt": await lt(parseFloat(blockElement.querySelector("input").value)); break;
@@ -641,21 +716,17 @@
         case "if1":
           const end_if_index = code_array.findIndex((row, i) => row[0] === "if2" && i > index);
           if (end_if_index !== -1) {
-            // 衝突フラグ(collisionDetected)を見て判断
             if (collisionDetected) {
-              // IFブロックに入ったので衝突状態を解決済みに
-              collisionDetected = false;
+              collisionDetected = false; // 衝突解決
 
-              // 終わりのブロックハイライト
               const endBlockElement = code_array[end_if_index][1];
               endBlockElement.classList.add("block_highlights");
 
-              // 内部実行
+              // IF真の場合、内部ブロック実行
               for (let k = index + 1; k < end_if_index; k++) {
                 if (!isRunning) break;
                 k = await processCode(k);
               }
-
               endBlockElement.classList.remove("block_highlights");
             }
             nextIndex = end_if_index; // IF終端へジャンプ
@@ -673,9 +744,9 @@
       return nextIndex; // 次インデックス返却
     }
 
-    //////////////////
-    ////一致判定/////
-    //////////////////
+    //////////////////////////////////////////////////
+    ////////////一致判定///////////////////
+    //////////////////////////////////////////////////
     async function check() {
       try {
         const userCanvas = document.getElementById('mainCanvas');
@@ -693,31 +764,23 @@
         const correctShape = getShapeData(correctImage);
 
         if (userShape.pixelCount === 0) {
-          console.log("No drawing detected.");
+          console.log("何も描かれていないようです。");
           showAnswerMark(false);
           return;
         }
 
         const similarity = compareShapes(userShape, correctShape);
-
         console.log(`類似度スコア: ${similarity.toFixed(3)}`);
 
-        //合格ライン（閾値）設定
+        // ステージ4だけ判定を甘くする
         const urlParams = new URLSearchParams(window.location.search);
         const currentStage = urlParams.get("stage") || "1";
-        let threshold = 0.70; // 基本の合格ライン70%
-        if (currentStage === "4") {
-          threshold = 0.50; // ステージ4だけ50%
-          console.log("aaaaaaaaaa");
-        }
+        let threshold = 0.75;
+        if (currentStage === "4") { threshold = 0.50; }//ステージ４だけ判定緩く
 
-        //類似度と閾値を比較
         const isCorrect = similarity >= threshold;
-
-        //マークを表示
         showAnswerMark(isCorrect);
 
-        //正解なら次へボタン表示
         if (isCorrect) {
           document.dispatchEvent(new CustomEvent("trianglecorrect"));
           const nextButton = document.getElementById("btn_next");
@@ -727,12 +790,14 @@
         }
 
       } catch (error) {
-        console.error("error:", error);
+        console.error("判定処理中にエラーが発生しました:", error);
         showAnswerMark(false);
       }
     }
 
-    //絵の中から描かれた図形だけを切り抜く（白を背景、色部分を対象）
+    /**
+     * 図形データの抽出
+     */
     function getShapeData(source) {
       // 作業用キャンバス作成
       const canvas = document.createElement('canvas');
@@ -743,7 +808,7 @@
       // 画像を描画
       ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
 
-      // 全ピクセルの色データ取得
+      // ピクセルデータ取得
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const binaryData = new Uint8Array(canvas.width * canvas.height);
 
@@ -757,12 +822,11 @@
         const b = imageData.data[i + 2];
         const pixelIndex = i / 4;
 
-        // 色がある部分（白以外）を検出
+        // 色の濃さで判定
         if (r < 250 || g < 250 || b < 250) {
           binaryData[pixelIndex] = 1;
           pixelCount++;
-          // 大きさの測定
-          // 描画範囲（外枠）を更新
+          // 描画範囲を更新
           const x = pixelIndex % canvas.width;
           const y = Math.floor(pixelIndex / canvas.width);
           minX = Math.min(minX, x);
@@ -774,10 +838,9 @@
         }
       }
 
-      // 図形が存在するか判定
       const boundingBox = (pixelCount > 20) ? { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 } : null;
 
-      // 解析結果（データと位置情報）を返す
+      // 解析データを返却
       return {
         binaryData: binaryData,
         width: canvas.width,
@@ -787,16 +850,18 @@
       };
     }
 
-    //2つの図形を重ねて類似度を採点
+    /**
+     * 図形の類似度比較
+     */
     function compareShapes(shapeA, shapeB) {
-      // 描画有無の確認
+      // 描画範囲の確認
       if (!shapeA.boundingBox || !shapeB.boundingBox) return 0;
 
-      // 比較用の最大サイズ決定
+      // 比較用サイズを決定
       const comparisonWidth = Math.max(shapeA.boundingBox.width, shapeB.boundingBox.width);
       const comparisonHeight = Math.max(shapeA.boundingBox.height, shapeB.boundingBox.height);
 
-      // 比較用キャンバス作成（A・B用）
+      // 比較用キャンバス作成
       const canvasA = document.createElement('canvas');
       canvasA.width = comparisonWidth;
       canvasA.height = comparisonHeight;
@@ -810,7 +875,7 @@
       const tempImgDataA = ctxA.createImageData(shapeA.boundingBox.width, shapeA.boundingBox.height);
       const tempImgDataB = ctxB.createImageData(shapeB.boundingBox.width, shapeB.boundingBox.height);
 
-      // 図形Aを切り出して中央配置
+      // 図形Aのピクセル抽出
       for (let y = 0; y < shapeA.boundingBox.height; y++) {
         for (let x = 0; x < shapeA.boundingBox.width; x++) {
           const index = y * shapeA.boundingBox.width + x;
@@ -820,10 +885,9 @@
           }
         }
       }
-      // 図形Aを中央に配置
       ctxA.putImageData(tempImgDataA, (comparisonWidth - shapeA.boundingBox.width) / 2, (comparisonHeight - shapeA.boundingBox.height) / 2);
 
-      // 図形Bを切り出して中央配置
+      // 図形Bのピクセル抽出
       for (let y = 0; y < shapeB.boundingBox.height; y++) {
         for (let x = 0; x < shapeB.boundingBox.width; x++) {
           const index = y * shapeB.boundingBox.width + x;
@@ -833,30 +897,29 @@
           }
         }
       }
-      // 図形Bを中央に配置
       ctxB.putImageData(tempImgDataB, (comparisonWidth - shapeB.boundingBox.width) / 2, (comparisonHeight - shapeB.boundingBox.height) / 2);
 
-      // 比較用画像データ取得
+      // 画像データ取得
       const dataA = ctxA.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
       const dataB = ctxB.getImageData(0, 0, comparisonWidth, comparisonHeight).data;
 
-      let intersection = 0; // 重なり部分
-      let union = 0;        // 全体の広さ
+      let intersection = 0;
+      let union = 0;
 
-      // ピクセルごとの一致判定
+      // 重なり具合を計算
       for (let i = 0; i < dataA.length; i += 4) {
         const pixelA = dataA[i + 3] > 0;
         const pixelB = dataB[i + 3] > 0;
 
         if (pixelA && pixelB) {
-          intersection++;   // 両方ある（重なり）
+          intersection++;
         }
         if (pixelA || pixelB) {
-          union++;          // どちらかある（全体）
+          union++;
         }
       }
 
-      // 一致率を返す
+      // 一致率を返却
       return union > 0 ? intersection / union : 0;
     }
 
@@ -870,146 +933,10 @@
     function showAnswerMark(isCorrect) {
       const mark = document.getElementById("answer-mark");
       mark.textContent = isCorrect ? "〇" : "×";
-      mark.style.color = isCorrect ? "green" : "red";
+      mark.style.color = isCorrect ? "#FF5252" : "#448AFF";
       mark.style.opacity = 1;
       setTimeout(() => { mark.style.opacity = 0; }, 1500);
     }
-
-
-    //////////////////
-    //チュートリアル///
-    //////////////////
-    let intro = introJs();
-    let turtlePositionSet = false;
-    let blockSet = false;
-    let numSet = false;
-    let paintdone = false;
-    let chekdone = false;
-    let trianglecorrect1 = false;
-    let trianglecorrect2 = false;
-    let trianglecorrect3 = false;
-    let obstacleSet = false;
-
-    //一時停止用の制御
-    intro.onafterchange(function (targetElement) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const stage = urlParams.get('stage') || '1';
-      const currentStep = intro._currentStep;
-      if (stage === '1') {
-        //ユーザーがキャンバスをクリックするのを待つ
-        if (currentStep === 3 && !turtlePositionSet) {
-          intro.exit();
-          const canvas = document.getElementById("canvas_wrapper");
-          const handler = () => {
-            turtlePositionSet = true;
-            canvas.removeEventListener("click", handler);
-            intro.goToStep(4);
-          };
-
-          canvas.addEventListener("click", handler);
-        }
-        //ユーザーがブロックを配置するのを待つ
-        if (currentStep === 5 && !blockSet) {
-          intro.exit();
-          document.addEventListener('codeArrayChanged', function checkFdBlock() {
-            if (code_array[0][0] === "fd") {
-              blockSet = true;
-              document.removeEventListener('codeArrayChanged', checkFdBlock);
-              intro.goToStep(6);
-            }
-          });
-        }
-        //数値入力を待つ
-        if (currentStep === 6 && !numSet) {
-          intro.exit();
-          const setupInputListener = () => {
-            const numberInput = document.getElementById("number1");
-            if (numberInput) {
-              const inputHandler = function () {
-                if (this.value === "300") {
-                  numSet = true;
-                  this.removeEventListener("input", inputHandler);
-                  document.removeEventListener('codeArrayChanged', setupInputListener);
-                  intro.goToStep(7);
-                }
-              };
-              numberInput.addEventListener("input", inputHandler);
-              return true;
-            }
-            return false;
-          };
-          const success = setupInputListener();
-          if (!success) {
-            document.addEventListener('codeArrayChanged', setupInputListener, { once: true });
-          }
-        }
-        //ユーザーが描画完了するのを待つ
-        if (currentStep === 7 && !paintdone) {
-          intro.exit();
-          document.addEventListener('paintdone', function checkpaintdone() {
-            paintdone = true;
-            document.removeEventListener('paintdone', checkpaintdone);
-            intro.goToStep(8);
-          }, { once: true });
-        }
-        //ユーザーのチェック完了を待つ
-        if (currentStep === 8 && !chekdone) {
-          intro.exit();
-          const checkbtn = document.getElementById("btn_check");
-          const handler = () => {
-            chekdone = true;
-            checkbtn.removeEventListener("click", handler);
-            intro.goToStep(9);
-          };
-
-          checkbtn.addEventListener("click", handler, { once: true });
-        }
-      }
-      else if (stage === '2') {
-        if (currentStep === 5 && !trianglecorrect1) {
-          intro.exit();
-          //ユーザーが三角形を描画するのを待つ
-          document.addEventListener('trianglecorrect', function checktrianglecorrect() {
-            trianglecorrect1 = true;
-            document.removeEventListener('trianglecorrect', checktrianglecorrect);
-            intro.goToStep(6);
-          }, { once: true });
-        }
-      }
-      else if (stage === '3') {
-        if (currentStep === 5 && !trianglecorrect2) {
-          intro.exit();
-          //ユーザーが三角形を描画するのを待つ
-          document.addEventListener('trianglecorrect', function checktrianglecorrect() {
-            trianglecorrect2 = true;
-            document.removeEventListener('trianglecorrect', checktrianglecorrect);
-            intro.goToStep(6);
-          }, { once: true });
-        }
-      }
-      else if (stage === '4') {
-        if (currentStep === 5 && !obstacleSet) {
-          intro.exit();
-          // ユーザーが障害物を生成するのを待つ
-          const generatebutton = document.getElementById("blockGenerateButton");
-          const handler = () => {
-            obstacleSet = true; // フラグを更新
-            generatebutton.removeEventListener("click", handler); // イベントリスナーを削除
-            intro.goToStep(6); // 次のステップに進む
-          };
-          generatebutton.addEventListener("click", handler); // イベントリスナーを追加
-        }
-        if (currentStep === 9 && !trianglecorrect3) {
-          intro.exit();
-          //ユーザーが三角形を描画するのを待つ
-          document.addEventListener('trianglecorrect', function checktrianglecorrect() {
-            trianglecorrect3 = true;
-            document.removeEventListener('trianglecorrect', checktrianglecorrect);
-            intro.goToStep(10).start();
-          }, { once: true });
-        }
-      }
-    });
   </script>
 </body>
 

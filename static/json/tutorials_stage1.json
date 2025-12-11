@@ -17,7 +17,7 @@
     },
     {
         "element": "#code_area",
-        "intro": "<p>「〇歩進む」ブロックを、このプログラムエリアにドラッグ＆ドロップで置いてみましょう。</p><img src='/static/assets/c1_gif.gif' style='width: 300px; display: block; margin: 8px auto;'>"
+        "intro": "<p>「〇歩進む」ブロックを、このプログラムエリアにドラッグ＆ドロップで置いてみましょう。</p><img src='static/assets/c1_gif.gif' style='width: 300px; display: block; margin: 8px auto;'>"
     },
     {
         "element": "#block1",
