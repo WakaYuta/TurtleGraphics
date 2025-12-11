@@ -97,6 +97,7 @@
     let isRunning = false;
     let animationFrameId = null; // 「歩く」アニメーションの管理番号
     let timeoutId = null;        // 「回転」の待ち時間の管理番号
+    let collisionDetected = false; //衝突フラグ
 
     // 要素の取得
     const maincanvas = document.querySelector("#mainCanvas");
@@ -475,6 +476,8 @@
 
         // 残りの距離を管理する変数
         let remainingDistance = inputDistance;
+        //衝突フラグリセット
+        collisionDetected = false;
 
         function fd_draw() {
           if (!isRunning) return; // 停止チェック
@@ -490,14 +493,23 @@
             const nextX = currentX + moveStep * Math.sin((a * Math.PI) / 180.0);
             const nextY = currentY - moveStep * Math.cos((a * Math.PI) / 180.0);
 
-            // 境界チェック
-            if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { resolve(); return; }
+            // 境界・障害物チェック
+            let hitWall = false;
+            if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { hitWall = true; }
+            if (!hitWall) {
+              const screenX = rect.left + window.pageXOffset + nextX;
+              const screenY = rect.top + window.pageYOffset + nextY;
+              for (const obstacle of obstacles) {
+                const bounds = getObstacleBounds(obstacle);
+                if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { hitWall = true; break; }
+              }
+            }
 
-            const screenX = rect.left + window.pageXOffset + nextX;
-            const screenY = rect.top + window.pageYOffset + nextY;
-            for (const obstacle of obstacles) {
-              const bounds = getObstacleBounds(obstacle);
-              if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { resolve(); return; }
+            if (hitWall) {
+              // ぶつかったらフラグを立てて終了
+              collisionDetected = true;
+              resolve();
+              return;
             }
 
             mainCtx.beginPath(); mainCtx.lineWidth = 10; mainCtx.moveTo(currentX, currentY);
@@ -556,6 +568,7 @@
     async function start() {
       if (isRunning) return; // 二重起動防止
       isRunning = true;
+      collisionDetected = false;
       x = y = a = 0; turtle.style.transform = `rotate(${a}deg)`;
       for (var i = 0; i < codeAreaSize; i++) {
         if (!isRunning) break; // 停止フラグ確認
@@ -584,6 +597,15 @@
       if (!code_array[index] || code_array[index][0] === 0) return index;
 
       const blockElement = code_array[index][1];
+      const blockType = code_array[index][0]; // ブロックの種類
+
+      if (collisionDetected) {
+        // 次のブロックが「壁にぶつかったら(if1)」じゃなかったら終了
+        if (blockType !== "if1") {
+          stopExecution(); // 停止
+          return index;
+        }
+      }
 
       // ハイライト開始
       blockElement.classList.add("block_highlights");
@@ -619,27 +641,21 @@
         case "if1":
           const end_if_index = code_array.findIndex((row, i) => row[0] === "if2" && i > index);
           if (end_if_index !== -1) {
-            let hit = false;
-            let rect = maincanvas.getBoundingClientRect();
-            const nextX = currentX + turtle_speed * Math.sin((a * Math.PI) / 180.0);
-            const nextY = currentY - turtle_speed * Math.cos((a * Math.PI) / 180.0);
-            if (nextX <= 0 || nextX >= maincanvas.width || nextY <= 0 || nextY >= maincanvas.height) { hit = true; }
-            const screenX = rect.left + window.pageXOffset + nextX;
-            const screenY = rect.top + window.pageYOffset + nextY;
-            for (const obstacle of obstacles) {
-              const bounds = getObstacleBounds(obstacle);
-              if (screenX >= bounds.left && screenX <= bounds.right && screenY >= bounds.top && screenY <= bounds.bottom) { hit = true; break; }
-            }
+            // 衝突フラグ(collisionDetected)を見て判断
+            if (collisionDetected) {
+              // IFブロックに入ったので衝突状態を解決済みに
+              collisionDetected = false;
 
-            if (hit) {
-              //終端ブロックもハイライト
+              // 終わりのブロックハイライト
               const endBlockElement = code_array[end_if_index][1];
               endBlockElement.classList.add("block_highlights");
-              // IF真の場合、内部ブロック実行
+
+              // 内部実行
               for (let k = index + 1; k < end_if_index; k++) {
+                if (!isRunning) break;
                 k = await processCode(k);
               }
-              //処理が終わったらハイライトを消す
+
               endBlockElement.classList.remove("block_highlights");
             }
             nextIndex = end_if_index; // IF終端へジャンプ
